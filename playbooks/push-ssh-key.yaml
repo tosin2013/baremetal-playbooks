@@ -1,6 +1,6 @@
 ---
 - name: Generate and copy SSH keys
-  hosts: localhost
+  hosts: github_servers
   gather_facts: false
 
   tasks:

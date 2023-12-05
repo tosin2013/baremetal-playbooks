@@ -28,4 +28,4 @@ with your changes.
 
 ## Playbooks
 
-`ansible-playbook syntax_highlighting_demo.yml -i hosts --ask-pass`
+` ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml" --ask-pass`

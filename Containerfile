@@ -31,6 +31,7 @@ pip3 install --progress-bar=off \
 -r requirements.txt && \
 mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles && \
 rm -rf $(pip3 cache dir) && \
+yum install -y sshpass && \  # Install sshpass
 # Avoid "fatal: detected dubious ownership in repository at" with newer git versions
 # See https://github.com/actions/runner-images/issues/6775
 git config --system --add safe.directory / && \
