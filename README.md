@@ -28,4 +28,10 @@ with your changes.
 
 ## Playbooks
 
-` ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml" --ask-pass`
+`./copy-ssh-id-and-test.sh admin@example.com"`
+
+`ansible-playbook -i hosts  playbooks/syntax_highlighting_demo.yml  -e "@secrets.yml"`
+
+`ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml"`
+
+`ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`
