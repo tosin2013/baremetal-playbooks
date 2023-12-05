@@ -6,39 +6,40 @@
   tasks:
     - name: Check if SSH key exists
       stat:
-          path: "{{ ssh_key_path }}/{{ ssh_key_file }}"
+        path: "{{ ssh_key_path }}/{{ ssh_key_file }}"
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: copy ssh_public_key variable in the ~/.ssh/{{ ssh_key_file }}.pub locally
+      ansible.builtin.copy:
+        content: "{{ ssh_public_key }}"
+        dest: "~/.ssh/{{ ssh_key_file }}.pub"
+      delegate_to: localhost
+    
+
+    - name: create ssh_private_key in the ~/.ssh/{{ ssh_key_file }} locally
+      ansible.builtin.copy:
+        content: "{{ ssh_private_key }}"
+        dest: "~/.ssh/{{ ssh_key_file }}"
+      delegate_to: localhost
 
     - name: Copy SSH keys to the server
       ansible.builtin.copy:
-          src: "{{ ssh_public_key }}"
+          src: "~/.ssh/{{ ssh_key_file }}.pub"
           dest: "{{ ssh_key_path }}/{{ ssh_key_file }}.pub"
           mode: 0600
+      delegate_to: "{{ inventory_hostname }}" 
 
     - name: Copy SSH private key to the server
       ansible.builtin.copy:
-          src: "{{ ssh_private_key }}"
+          src: "~/.ssh/{{ ssh_key_file }}"
           dest: "{{ ssh_key_path }}/{{ ssh_key_file }}"
           mode: 0600
+      delegate_to: "{{ inventory_hostname }}"
 
     - name: Add public key to authorized_keys
       ansible.builtin.lineinfile:
-          path: "{{ ssh_key_path }}/authorized_keys"
-          line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
-          create: yes
+        path: "{{ ssh_key_path }}/authorized_keys"
+        line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
+        create: yes
       become: true
-
-    - name: Copy SSH keys to the server
-      ansible.builtin.copy:
-          src: "{{ item }}"
-          dest: "{{ ssh_key_path }}/{{ item }}"
-          mode: 0600
-      with_items:
-          - "{{ ssh_key_file }}"
-          - "{{ ssh_key_file }}.pub"
-
-    - name: Add public key to authorized_keys
-      ansible.builtin.lineinfile:
-          path: "{{ ssh_key_path }}/authorized_keys"
-          line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
-          create: yes
-      become: true
+      delegate_to: "{{ inventory_hostname }}"
