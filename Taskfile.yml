@@ -9,7 +9,7 @@ env: &env
 vars:
   HOSTNAME:
     sh: echo ${HOSTNAME:-localhost}
-  CNT_NAME: creator-ee
+  CNT_NAME: baremetal-playbooks
   VERSION:
     sh: git describe --tags
   CNT_NAME_TAG: "{{.CNT_NAME}}:{{.VERSION}}"

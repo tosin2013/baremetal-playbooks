@@ -2,7 +2,7 @@
 # cspell: ignore exuo
 set -exuo pipefail
 
-CNT=${1:-quay.io/ansible/creator-ee:latest}
+CNT=${1:-quay.io/takinosh/baremetal-playbooks:latest}
 
 
 # creator-base container is expected to have python3

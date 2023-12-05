@@ -9,7 +9,7 @@ ARG CONTAINER_NAME
 ENV CONTAINER_NAME $CONTAINER_NAME
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
-LABEL org.opencontainers.image.source https://github.com/ansible/creator-ee
+LABEL org.opencontainers.image.source https://github.com/ansible/baremetal-playbooks
 LABEL org.opencontainers.image.authors "Ansible DevTools"
 LABEL org.opencontainers.image.vendor "Red Hat"
 LABEL org.opencontainers.image.licenses "GPL-3.0"
