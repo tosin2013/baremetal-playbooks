@@ -1,0 +1,59 @@
+---
+- name: Update GitHub Secret and Trigger Pipeline
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Get repository public key
+      uri:
+        url: "https://api.github.com/repos/{{ github_repo }}/actions/secrets/public-key"
+        method: GET
+        headers:
+          Authorization: "token {{ github_token }}"
+          Accept: "application/vnd.github.v3+json"
+      register: public_key_response
+
+    - name: Encrypt secret
+      shell: |
+        echo -n '{{ ssh_password }}' | openssl rsautl -encrypt -pubin -inkey <(echo '{{ public_key_response.json.key }}') | base64
+      register: encrypted_secret
+
+    - name: Update secret on GitHub
+      uri:
+        url: "https://api.github.com/repos/{{ github_repo }}/actions/secrets/{{ secret_name }}"
+        method: PUT
+        body: >
+          {
+            "encrypted_value": "{{ encrypted_secret.stdout }}",
+            "key_id": "{{ public_key_response.json.key_id }}"
+          }
+        body_format: json
+        headers:
+          Authorization: "token {{ github_token }}"
+          Accept: "application/vnd.github.v3+json"
+
+    - name: Trigger GitHub Actions Workflow
+      uri:
+        url: "{{ github_api_url }}/repos/{{ github_repo }}/actions/workflows/{{ workflow_id }}/dispatches"
+        method: POST
+        body: >
+          {
+            "ref": "{{ workflow_ref }}",
+            "inputs": {
+              "input1": "{{ workflow_inputs.input1 }}",
+              "input2": "{{ workflow_inputs.input2 }}"
+              # Add other inputs as necessary
+            }
+          }
+        body_format: json
+        headers:
+          Authorization: "Bearer {{ github_token }}"
+          Content-Type: "application/json"
+          Accept: "application/vnd.github.v3+json"
+        status_code: 204
+      register: response
+
+
+    - name: Display Pipeline Run URL
+      debug:
+        msg: "Pipeline run triggered. You can view it at: {{ pipeline_response.json.url }}"
+      when: pipeline_response is defined and pipeline_response.json.url is defined
