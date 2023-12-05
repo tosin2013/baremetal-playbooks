@@ -1,0 +1,45 @@
+---
+- name: Generate and copy SSH keys
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Check if SSH key exists
+      stat:
+          path: "{{ ssh_key_path }}/{{ ssh_key_file }}"
+      register: ssh_key_stat
+
+    - name: Copy SSH keys to the server
+      ansible.builtin.copy:
+          src: "{{ ssh_public_key }}"
+          dest: "{{ ssh_key_path }}/{{ ssh_key_file }}.pub"
+          mode: 0600
+
+    - name: Copy SSH private key to the server
+      ansible.builtin.copy:
+          src: "{{ ssh_private_key }}"
+          dest: "{{ ssh_key_path }}/{{ ssh_key_file }}"
+          mode: 0600
+
+    - name: Add public key to authorized_keys
+      ansible.builtin.lineinfile:
+          path: "{{ ssh_key_path }}/authorized_keys"
+          line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
+          create: yes
+      become: true
+
+    - name: Copy SSH keys to the server
+      ansible.builtin.copy:
+          src: "{{ item }}"
+          dest: "{{ ssh_key_path }}/{{ item }}"
+          mode: 0600
+      with_items:
+          - "{{ ssh_key_file }}"
+          - "{{ ssh_key_file }}.pub"
+
+    - name: Add public key to authorized_keys
+      ansible.builtin.lineinfile:
+          path: "{{ ssh_key_path }}/authorized_keys"
+          line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
+          create: yes
+      become: true
