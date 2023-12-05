@@ -25,3 +25,7 @@ We use [taskfile](https://taskfile.dev/) as build tool, so you should run
 `task -l` to list available. If you run just `task`, it will run the default
 set of build tasks. If these are passing, you are ready to open a pull request
 with your changes.
+
+## Playbooks
+
+`ansible-playbook syntax_highlighting_demo.yml -i hosts --ask-pass`
