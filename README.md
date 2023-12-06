@@ -35,3 +35,5 @@ with your changes.
 `ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml"`
 
 `ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`
+
+`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@github-actions-vars.yml"`

@@ -1,2 +1,2 @@
 [github_servers]
-server.example.com ansible_user=admin ansible_password=secret
+server.example.com ansible_user=admin

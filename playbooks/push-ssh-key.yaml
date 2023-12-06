@@ -37,9 +37,9 @@
       delegate_to: "{{ inventory_hostname }}"
 
     - name: Add public key to authorized_keys
-      ansible.builtin.lineinfile:
-        path: "{{ ssh_key_path }}/authorized_keys"
-        line: "{{ lookup('file', ssh_key_path + '/' + ssh_key_file + '.pub') }}"
-        create: yes
+      ansible.builtin.authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/' + ssh_key_file + '.pub') }}"
       become: true
       delegate_to: "{{ inventory_hostname }}"

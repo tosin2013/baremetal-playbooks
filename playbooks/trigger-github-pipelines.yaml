@@ -1,7 +1,8 @@
 ---
 - name: Update GitHub Secret and Trigger Pipeline
-  hosts: localhost
+  hosts: github_servers
   gather_facts: no
+
   tasks:
     - name: Get repository public key
       uri:
@@ -11,11 +12,46 @@
           Authorization: "token {{ github_token }}"
           Accept: "application/vnd.github.v3+json"
       register: public_key_response
+      delegate_to: "{{ inventory_hostname }}" 
+
+    - name: Debug public_key_response
+      debug:
+        var: public_key_response
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Get the key_id
+      set_fact:
+        key_id: "{{ public_key_response.json.key_id }}"
+      delegate_to: "{{ inventory_hostname }}" 
+
+    - name: Debug public_key_response
+      debug:
+        var: public_key_response
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Debug key_id if it fails exit
+      debug:
+        msg: "key_id is {{ key_id }}"
+      delegate_to: "{{ inventory_hostname }}" 
+      failed_when: key_id is not defined
 
     - name: Encrypt secret
-      shell: |
-        echo -n '{{ ssh_password }}' | openssl rsautl -encrypt -pubin -inkey <(echo '{{ public_key_response.json.key }}') | base64
+      script: scripts/encrypt_secret.py
+      environment:
+        PUBLIC_KEY: "{{ public_key_response.json.key }}"
+        SECRET: "{{ ssh_password }}"
       register: encrypted_secret
+      delegate_to:  localhost
+
+    - name: Fail if encrypted_secret is empty
+      fail:
+        msg: "encrypted_secret is empty"
+      when: encrypted_secret.stdout is not defined or encrypted_secret.stdout == ''
+  
+    - name: if encrypted_secret is empty exit
+      debug:
+        msg: "encrypted_secret is {{ encrypted_secret.stdout }}"
+      delegate_to: "{{ inventory_hostname }}" 
 
     - name: Update secret on GitHub
       uri:
@@ -23,27 +59,40 @@
         method: PUT
         body: >
           {
-            "encrypted_value": "{{ encrypted_secret.stdout }}",
-            "key_id": "{{ public_key_response.json.key_id }}"
+            "encrypted_value": "{{ encrypted_secret.stdout | trim  }}",
+            "key_id": "{{ key_id }}"
           }
         body_format: json
         headers:
           Authorization: "token {{ github_token }}"
           Accept: "application/vnd.github.v3+json"
+        status_code: 204
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Wait for 2 minutes before pipeline run
+      pause:
+        minutes: 2
+
+    - name: Get workflows
+      uri:
+        url: "{{ github_api_url }}/repos/{{ github_repo }}/actions/workflows"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ github_token }}"
+          Accept: "application/vnd.github.v3+json"
+      register: workflows_response
+
+    - name: Find workflow ID
+      set_fact:
+        workflow_id: "{{ item.id }}"
+      loop: "{{ workflows_response.json.workflows }}"
+      when: item.name == workflow_file_name
 
     - name: Trigger GitHub Actions Workflow
       uri:
         url: "{{ github_api_url }}/repos/{{ github_repo }}/actions/workflows/{{ workflow_id }}/dispatches"
         method: POST
-        body: >
-          {
-            "ref": "{{ workflow_ref }}",
-            "inputs": {
-              "input1": "{{ workflow_inputs.input1 }}",
-              "input2": "{{ workflow_inputs.input2 }}"
-              # Add other inputs as necessary
-            }
-          }
+        body: "{{ json_body }}"
         body_format: json
         headers:
           Authorization: "Bearer {{ github_token }}"
@@ -52,8 +101,22 @@
         status_code: 204
       register: response
 
+    - name: Get workflow runs
+      uri:
+        url: "{{ github_api_url }}/repos/{{ github_repo }}/actions/runs"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ github_token }}"
+          Accept: "application/vnd.github.v3+json"
+      register: runs_response
+
+    - name: Find run URL
+      set_fact:
+        run_url: "{{ item.html_url }}"
+      loop: "{{ runs_response.json.workflow_runs }}"
+      when: item.workflow_id == workflow_id and item.head_sha == workflow_ref
 
     - name: Display Pipeline Run URL
       debug:
-        msg: "Pipeline run triggered. You can view it at: {{ pipeline_response.json.url }}"
-      when: pipeline_response is defined and pipeline_response.json.url is defined
+        msg: "Pipeline run triggered. You can view it at: {{ run_url }}"
+      when: run_url is defined
