@@ -1,0 +1,22 @@
+# GitHub configuration
+github_token: 'your_github_personal_access_token'  # Your GitHub token with appropriate permissions
+github_repo: 'tosin2013/kcli-pipelines'        # GitHub repository in the format 'username/repo'
+workflow_file_name: 'configure-rhel8-equinix.yaml' # Name of the workflow file
+workflow_ref: 'main'                               # Branch or tag name on which to trigger the workflow
+
+# (Optional) If your workflow requires inputs, define them here
+json_body:
+  ref: "{{ workflow_ref }}"
+  inputs:
+    hostname: server.example.com
+    target_server: rhel8-equinix
+    forwarder: 1.1.1.1
+    domain: example.com
+
+# API Endpoint Configuration
+github_api_url: 'https://api.github.com'           # Base URL for the GitHub API
+
+
+configure_secrets: false
+secret_name: "SSH_PASSWORD"
+ssh_password: "test"

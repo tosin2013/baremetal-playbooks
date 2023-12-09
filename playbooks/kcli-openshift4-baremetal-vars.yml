@@ -1,0 +1,34 @@
+# GitHub configuration
+github_token: 'your_github_personal_access_token'  # Your GitHub token with appropriate permissions
+github_repo: 'tosin2013/kcli-pipelines'        # GitHub repository in the format 'username/repo'
+workflow_file_name: 'Deploy kcli-openshift4-baremetal instances on KVM' # Name of the workflow file
+workflow_ref: 'main'                               # Branch or tag name on which to trigger the workflow
+
+# (Optional) If your workflow requires inputs, define them here
+json_body:
+  ref: "{{ workflow_ref }}"
+  inputs:
+    hostname: server.example.com  # The hostname of the target server
+    target_server: rhel8-equinix  # The name of the target server
+    vm_name: kcli-openshift4-baremetal  # The name of the virtual machine
+    action: create  # The action to perform (create/delete)
+    deploy_openshift: 'true'  # Whether to deploy OpenShift
+    auto_launch_steps: 'true'  # Whether to automatically launch deployment steps
+    deployment_tag: '4.14'  # The version tag for the deployment
+    disconnected_install: 'false'  # Whether to perform a disconnected installation
+    deployment_config: cnv-kcli-openshift4-baremetal.yml  # The deployment configuration file
+
+# This YAML file contains the variable definitions for deploying OpenShift 4 on bare metal using kcli.
+# It includes multiple file paths that are relevant to the deployment process.
+
+# cnv-kcli-openshift4-baremetal.yml
+# convereged-kcli-openshift4-baremetal.yml
+# kcli-openshift4-baremetal.yml
+
+# API Endpoint Configuration
+github_api_url: 'https://api.github.com'           # Base URL for the GitHub API
+
+
+configure_secrets: false
+secret_name: "SSH_PASSWORD"
+ssh_password: "test"
