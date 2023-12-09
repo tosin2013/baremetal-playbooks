@@ -28,6 +28,23 @@ with your changes.
 
 ## Playbooks
 
+This code selection consists of a series of commands written in Markdown format. These commands are used to execute various Ansible playbooks for different purposes. Here's a breakdown of the commands:
+
+1. `./copy-ssh-id-and-test.sh admin@example.com`: This command is used to copy the SSH key and test the connection to the specified host.
+
+2. `ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml"`: This command executes the Ansible playbook `push-ssh-key.yaml` using the inventory file `hosts` and the variables defined in `secrets.yml`.
+
+3. `ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`: This command executes the Ansible playbook `push-pipeline-variables.yaml` using the inventory file `hosts` and passing the `variables_file` parameter with the specified value.
+
+4. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@github-actions-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `github-actions-vars.yml`.
+
+5. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@kcli-openshift4-baremetal-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `kcli-openshift4-baremetal-vars.yml`.
+
+6. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
+
+7. `ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `populate-hostnames-on-freeipa.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
+
+Please note that the file path for this code selection is `/Users/takinosh/workspace/baremetal-playbooks/README.md`.
 `./copy-ssh-id-and-test.sh admin@example.com"`
 
 `ansible-playbook -i hosts  playbooks/syntax_highlighting_demo.yml  -e "@secrets.yml"`
@@ -37,3 +54,11 @@ with your changes.
 `ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`
 
 `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@github-actions-vars.yml"`
+
+`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@kcli-openshift4-baremetal-vars.yml"`
+
+`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`
+
+
+# ansible-galaxy collection install community.general
+`ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`

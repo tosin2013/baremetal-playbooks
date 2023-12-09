@@ -13,27 +13,33 @@
           Accept: "application/vnd.github.v3+json"
       register: public_key_response
       delegate_to: "{{ inventory_hostname }}" 
+      when: configure_secrets | bool
+
 
     - name: Debug public_key_response
       debug:
         var: public_key_response
       delegate_to: "{{ inventory_hostname }}"
+      when: configure_secrets | bool
 
     - name: Get the key_id
       set_fact:
         key_id: "{{ public_key_response.json.key_id }}"
       delegate_to: "{{ inventory_hostname }}" 
+      when: configure_secrets | bool
 
     - name: Debug public_key_response
       debug:
         var: public_key_response
       delegate_to: "{{ inventory_hostname }}"
+      when: configure_secrets | bool
 
     - name: Debug key_id if it fails exit
       debug:
         msg: "key_id is {{ key_id }}"
       delegate_to: "{{ inventory_hostname }}" 
       failed_when: key_id is not defined
+      when: configure_secrets | bool
 
     - name: Encrypt secret
       script: scripts/encrypt_secret.py
@@ -42,16 +48,18 @@
         SECRET: "{{ ssh_password }}"
       register: encrypted_secret
       delegate_to:  localhost
+      when: configure_secrets | bool
 
-    - name: Fail if encrypted_secret is empty
-      fail:
-        msg: "encrypted_secret is empty"
-      when: encrypted_secret.stdout is not defined or encrypted_secret.stdout == ''
+    #- name: Fail if encrypted_secret is empty
+    #  fail:
+    #    msg: "encrypted_secret is empty"
+    #  when: encrypted_secret.stdout is not defined or encrypted_secret.stdout == '' 
   
     - name: if encrypted_secret is empty exit
       debug:
         msg: "encrypted_secret is {{ encrypted_secret.stdout }}"
       delegate_to: "{{ inventory_hostname }}" 
+      when: configure_secrets | bool
 
     - name: Update secret on GitHub
       uri:
@@ -68,10 +76,12 @@
           Accept: "application/vnd.github.v3+json"
         status_code: 204
       delegate_to: "{{ inventory_hostname }}"
+      when: configure_secrets | bool
 
-    - name: Wait for 2 minutes before pipeline run
+    - name: Wait for 1 minutes before pipeline run
       pause:
-        minutes: 2
+        minutes: 1
+      when: configure_secrets | bool
 
     - name: Get workflows
       uri:
