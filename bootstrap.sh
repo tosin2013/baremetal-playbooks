@@ -10,7 +10,9 @@ else
 fi
 
 function usage {
-    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--ipa-server]"
+    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--ipa-server]"
+    echo "End-to-End: $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
+    echo "Download Image: $0 --copy-image"
     exit 1
 }
 
@@ -68,6 +70,10 @@ do
         ;;
         --trigger-github-pipelines)
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$GITHUB_ACTIONS_VARS_FILE"
+        shift
+        ;;
+        --copy-image)
+        ssh ${NEW_USERNAME}@${NEW_HOST} " sudo kcli download image rhel8"
         shift
         ;;
         --ipa-server)
