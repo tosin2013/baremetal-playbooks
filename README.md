@@ -26,6 +26,14 @@ We use [taskfile](https://taskfile.dev/) as build tool, so you should run
 set of build tasks. If these are passing, you are ready to open a pull request
 with your changes.
 
+## Prerequesites
+```
+curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+mv yq_linux_amd64 yq
+chmod +x yq
+$ sudo mv yq /usr/local/bin
+```
+
 ## Playbooks
 
 This code selection consists of a series of commands written in Markdown format. These commands are used to execute various Ansible playbooks for different purposes. Here's a breakdown of the commands:
