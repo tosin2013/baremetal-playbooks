@@ -4,8 +4,8 @@
 
   tasks:
 
-    - name: Include the base variables
-      ansible.builtin.include_vars: "vars/main.yml"
+    #- name: Include the base variables
+    #  ansible.builtin.include_vars: "vars/main.yml"
     - name: Debug names and hostvars
       debug:
         var: names
