@@ -16,6 +16,16 @@ function usage {
     exit 1
 }
 
+function copy_dir_files {
+  # Define the target host and directory
+  TARGET_HOST="${NEW_USERNAME}@${NEW_HOST}"
+  TARGET_DIR="/tmp/baremetal-playbooks"
+
+  # Copy files using SSH
+  ssh $TARGET_HOST "mkdir -p $TARGET_DIR"
+  scp files/* $TARGET_HOST:$TARGET_DIR
+}
+
 if [ $# -eq 0 ]; then
     usage
 fi
@@ -74,6 +84,10 @@ do
         ;;
         --copy-image)
         ssh ${NEW_USERNAME}@${NEW_HOST} " sudo kcli download image rhel8"
+        shift
+        ;;
+        --copy-files)
+        copy_dir_files
         shift
         ;;
         --ipa-server)
