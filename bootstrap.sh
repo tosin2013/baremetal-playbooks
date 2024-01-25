@@ -84,6 +84,7 @@ do
         ;;
         --copy-image)
         ssh ${NEW_USERNAME}@${NEW_HOST} " sudo kcli download image rhel8"
+        ssh ${NEW_USERNAME}@${NEW_HOST} " sudo kcli download image rhel9"
         shift
         ;;
         --copy-files)
