@@ -54,7 +54,7 @@ jobs:
             collections
           key: galaxy-${{ hashFiles('_build/requirements.yml') }}
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
