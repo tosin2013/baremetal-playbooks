@@ -107,6 +107,7 @@ do
         --ocp-ai-svc)
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$OCP_AI_SVC_VARS_FILE"
         shift
+        ;;
         *)
         usage
         ;;
