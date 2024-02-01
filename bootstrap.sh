@@ -13,6 +13,9 @@ function usage {
     echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--ipa-server]"
     echo "End-to-End: $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
     echo "Download Image: $0 --copy-image"
+    echo "Copy Files: $0 --copy-files"
+    echo "FreeIPA Server: $0 --ipa-server"
+    echo "OCP AI Service: $0 --ocp-ai-svc"
     exit 1
 }
 
@@ -41,6 +44,7 @@ SECRETS_FILE="vars/secrets.yml"
 PIPELINES_VARS="/projects/baremetal-playbooks/vars/pipeline-variables.yaml"
 GITHUB_ACTIONS_VARS_FILE="vars/github-actions-vars.yml"
 FREEIPA_VARS_FILE="vars/freeipa-vars.yml"
+OCP_AI_SVC_VARS_FILE="vars/ocp-ai-svc-vars.yml"
 
 # Use yq to update ssh_public_key and ssh_private_key values in secrets.yml
 ./yq e -i ".ssh_public_key = \"$SSH_PUBLIC_KEY\"" "$SECRETS_FILE"
@@ -66,6 +70,11 @@ cat $GITHUB_ACTIONS_VARS_FILE
 ./yq e -i  ".freeipa_server_admin_password =\"$FREEIPA_SERVER_ADMIN_PASSWORD\"" "$FREEIPA_VARS_FILE"
 ./yq e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$FREEIPA_VARS_FILE"
 cat $FREEIPA_VARS_FILE
+
+# Use yq to update github_token in freeipa-vars.yml
+./yq e -i ".github_token = \"$OCP_AI_SVC_PIPELINES_GITHUB_TOKEN\"" "$OCP_AI_SVC_VARS_FILE"
+./yq e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$OCP_AI_SVC_VARS_FILE"
+cat $OCP_AI_SVC_VARS_FILE
 
 for arg in "$@"
 do
@@ -95,6 +104,9 @@ do
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$FREEIPA_VARS_FILE"
         shift
         ;;
+        --ocp-ai-svc)
+        ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$OCP_AI_SVC_VARS_FILE"
+        shift
         *)
         usage
         ;;
