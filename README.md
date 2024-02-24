@@ -1,4 +1,4 @@
-# Ansible Creator Execution Environment
+# Baremetal Lab GitHub Actions Workflows
 
 This is a container (execution environment) aimed towards being used
 for the development and testing of the Ansible content. We should also mention
@@ -51,21 +51,6 @@ This code selection consists of a series of commands written in Markdown format.
 6. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
 
 7. `ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `populate-hostnames-on-freeipa.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
-
-Please note that the file path for this code selection is `/Users/takinosh/workspace/baremetal-playbooks/README.md`.
-`./copy-ssh-id-and-test.sh admin@example.com"`
-
-`ansible-playbook -i hosts  playbooks/syntax_highlighting_demo.yml  -e "@secrets.yml"`
-
-`ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml"`
-
-`ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@github-actions-vars.yml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@kcli-openshift4-baremetal-vars.yml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`
 
 
 # ansible-galaxy collection install community.general
