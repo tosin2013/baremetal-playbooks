@@ -41,39 +41,53 @@ sed -i "/^\[github_servers\]/!b;n;c$NEW_HOST ansible_user=$NEW_USERNAME" "$ORIGI
 
 # Define the path to the secrets file
 SECRETS_FILE="vars/secrets.yml"
-PIPELINES_VARS="/projects/baremetal-playbooks/vars/pipeline-variables.yaml"
+PIPELINES_VARS="$(pwd)/vars/pipeline-variables.yaml"
 GITHUB_ACTIONS_VARS_FILE="vars/github-actions-vars.yml"
 FREEIPA_VARS_FILE="vars/freeipa-vars.yml"
 OCP_AI_SVC_VARS_FILE="vars/ocp-ai-svc-vars.yml"
 
+
+# if yq not installed use ./yq path 
+if [ -x "$(command -v yq)" ]; then
+  echo 'yq is installed.' >&2
+  YQ_COMMAND="yq"
+elif [ -x "$(command -v ./yq)" ]; 
+then
+  echo  './yq is not installed.' >&2
+  YQ_COMMAND="./yq"
+else 
+  echo 'Error: yq is not installed.' >&2
+  exit 1
+fi
+
 # Use yq to update ssh_public_key and ssh_private_key values in secrets.yml
-./yq e -i ".ssh_public_key = \"$SSH_PUBLIC_KEY\"" "$SECRETS_FILE"
-./yq e -i ".ssh_private_key = \"$SSH_PRIVATE_KEY\"" "$SECRETS_FILE"
+${YQ_COMMAND} e -i ".ssh_public_key = \"$SSH_PUBLIC_KEY\"" "$SECRETS_FILE"
+${YQ_COMMAND} e -i ".ssh_private_key = \"$SSH_PRIVATE_KEY\"" "$SECRETS_FILE"
 
 cat $SECRETS_FILE
 
 # Use yq to update github_token, ssh_password, and json_body variables in github-actions-vars.yml
-./yq e -i ".github_token = \"$GITHUB_TOKEN\"" "$GITHUB_ACTIONS_VARS_FILE"
-./yq e -i ".ssh_password = \"$SSH_PASSWORD\"" "$GITHUB_ACTIONS_VARS_FILE"
-./yq e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$GITHUB_ACTIONS_VARS_FILE"
-./yq e -i ".json_body.inputs.domain = \"$NEW_DOMAIN\"" "$GITHUB_ACTIONS_VARS_FILE"
-./yq e -i ".json_body.inputs.forwarder = \"$NEW_FORWARDER\"" "$GITHUB_ACTIONS_VARS_FILE"
+${YQ_COMMAND} e -i ".github_token = \"$GITHUB_TOKEN\"" "$GITHUB_ACTIONS_VARS_FILE"
+${YQ_COMMAND} e -i ".ssh_password = \"$SSH_PASSWORD\"" "$GITHUB_ACTIONS_VARS_FILE"
+${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$GITHUB_ACTIONS_VARS_FILE"
+${YQ_COMMAND} e -i ".json_body.inputs.domain = \"$NEW_DOMAIN\"" "$GITHUB_ACTIONS_VARS_FILE"
+${YQ_COMMAND} e -i ".json_body.inputs.forwarder = \"$NEW_FORWARDER\"" "$GITHUB_ACTIONS_VARS_FILE"
 
 cat $GITHUB_ACTIONS_VARS_FILE
 
 
 
 # Use yq to update github_token in freeipa-vars.yml
-./yq e -i ".github_token = \"$KCLI_PIPELINES_GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
-./yq e -i ".freeipa_server_fqdn = \"$FREEIPA_SERVER_FQDN\""  "$FREEIPA_VARS_FILE"
-./yq e -i ".freeipa_server_domain = \"$FREEIPA_SERVER_DOMAIN\""  "$FREEIPA_VARS_FILE"
-./yq e -i  ".freeipa_server_admin_password =\"$FREEIPA_SERVER_ADMIN_PASSWORD\"" "$FREEIPA_VARS_FILE"
-./yq e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i ".github_token = \"$KCLI_PIPELINES_GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i ".freeipa_server_fqdn = \"$FREEIPA_SERVER_FQDN\""  "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i ".freeipa_server_domain = \"$FREEIPA_SERVER_DOMAIN\""  "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i  ".freeipa_server_admin_password =\"$FREEIPA_SERVER_ADMIN_PASSWORD\"" "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$FREEIPA_VARS_FILE"
 cat $FREEIPA_VARS_FILE
 
 # Use yq to update github_token in freeipa-vars.yml
-./yq e -i ".github_token = \"$OCP_AI_SVC_PIPELINES_GITHUB_TOKEN\"" "$OCP_AI_SVC_VARS_FILE"
-./yq e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$OCP_AI_SVC_VARS_FILE"
+${YQ_COMMAND} e -i ".github_token = \"$OCP_AI_SVC_PIPELINES_GITHUB_TOKEN\"" "$OCP_AI_SVC_VARS_FILE"
+${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$OCP_AI_SVC_VARS_FILE"
 cat $OCP_AI_SVC_VARS_FILE
 
 for arg in "$@"
@@ -84,11 +98,11 @@ do
         shift
         ;;
         --push-pipeline-vars)
-        ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-pipeline-variables.yaml -e "variables_file=$PIPELINES_VARS"
+        ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-pipeline-variables.yaml -e "variables_file=$PIPELINES_VARS" || exit $?
         shift
         ;;
         --trigger-github-pipelines)
-        ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$GITHUB_ACTIONS_VARS_FILE"
+        ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$GITHUB_ACTIONS_VARS_FILE" || exit $?
         shift
         ;;
         --copy-image)
