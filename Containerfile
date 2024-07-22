@@ -29,11 +29,11 @@ RUN microdnf install --assumeyes ncurses && \
     pip3 install --progress-bar=off -r requirements.txt && \
     mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles /usr/share/ansible/collections && \
     rm -rf $(pip3 cache dir) && \
-    microdnf install -y sshpass openssl wget tar && \
-    wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
-    tar -xvzf vault.tar.gz  && \
+    microdnf install -y sshpass openssl wget unzip && \
+    wget https://releases.hashicorp.com/vault/1.17.2/vault_1.17.2_linux_amd64.zip -O vault_1.17.2_linux_amd64.zip  && \
+    unzip vault_1.17.2_linux_amd64.zip   && \
     mv vault /usr/local/bin/vault && \
-    rm vault.tar.gz && \
+    rm vault_1.17.2_linux_amd64.zip   && \
     git config --system --add safe.directory / && \
     printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
 
