@@ -4,7 +4,7 @@ metadata:
 components:
   - name: tooling-container
     container:
-      image: quay.io/takinosh/baremetal-playbooks@sha256:b9635fdc60c0ea24a34c69a0d0a93eec3c0350f64d774bf14609b79e7f51b0eb #quay.io/devspaces/ansible-creator-ee@sha256:5d9bc07920753cfd1aafcab21358060d08f846865d5dd75a02941787471c838c
+      image: quay.io/takinosh/baremetal-playbooks@sha256:7e7494c5ee329d2b21e00c22cc825942970a3e3a9cae87660eb2f4c7397ae1fb #quay.io/devspaces/ansible-creator-ee@sha256:5d9bc07920753cfd1aafcab21358060d08f846865d5dd75a02941787471c838c
       memoryRequest: 256M
       memoryLimit: 6Gi
       cpuRequest: 250m
