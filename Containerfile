@@ -39,7 +39,7 @@ RUN microdnf install --assumeyes ncurses && \
     mv hcp /usr/local/bin/hcp && \
     rm hcp_0.4.0_linux_amd64.zip   && \
     curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
-    mv yq_linux_amd64 yq &&  mv yq /usr/local/bin && chmod +x yq && \
+    mv yq_linux_amd64 yq && chmod +x yq && mv yq /usr/local/bin &&  \
     git config --system --add safe.directory / && \
     printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
 
