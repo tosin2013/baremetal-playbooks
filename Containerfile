@@ -35,7 +35,7 @@ yum install -y sshpass openssl wget && \
 wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
     tar -xvzf vault.tar.gz && \
     mv vault /usr/local/bin/vault && \
-    rm vault.tar.gz \
+    rm vault.tar.gz && \
 # Avoid "fatal: detected dubious ownership in repository at" with newer git versions
 # See https://github.com/actions/runner-images/issues/6775
 git config --system --add safe.directory / && \
