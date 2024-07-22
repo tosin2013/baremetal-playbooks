@@ -31,9 +31,9 @@ RUN microdnf install --assumeyes ncurses && \
     rm -rf $(pip3 cache dir) && \
     microdnf install -y sshpass openssl wget tar && \
     wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
-    #tar -xvzf vault.tar.gz  && \
-    #mv vault /usr/local/bin/vault && \
-    #rm vault.tar.gz && \
+    tar -xvzf vault.tar.gz  && \
+    mv vault /usr/local/bin/vault && \
+    rm vault.tar.gz && \
     git config --system --add safe.directory / && \
     printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
 
@@ -55,7 +55,7 @@ RUN for dir in \
       /etc/group ; \
     do touch $file ; chmod g+rw $file ; chgrp root $file ; done
 
-#COPY collections/ /usr/share/ansible/collections
+COPY collections/ /usr/share/ansible/collections
 
 # Add some helpful CLI commands to check versions
 RUN set -ex \
