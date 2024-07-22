@@ -26,7 +26,7 @@ We use [taskfile](https://taskfile.dev/) as build tool, so you should run
 set of build tasks. If these are passing, you are ready to open a pull request
 with your changes.
 
-## Prerequesites
+## Prerequisites
 **Install yq**
 ```
 curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
@@ -34,9 +34,16 @@ mv yq_linux_amd64 yq
 chmod +x yq
 $ sudo mv yq /usr/local/bin
 ```
+
 **Install pip packages**
 ```
 pip3 install -r requirements.txt
+```
+
+**Optional: Login to Vault**
+If you plan to use the `--load-from-vault` flag in the `bootstrap.sh` script, ensure you are logged into Vault:
+```
+vault login
 ```
 
 ## Playbooks
