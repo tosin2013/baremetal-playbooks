@@ -2,7 +2,15 @@
 # Usage: ./bootstrap.sh [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines]
 set -x 
 # Load environment variables from .env file
-if [ -f .env ]; then
+if [ "$1" == "--load-from-vault" ]; then
+  if command -v vault &> /dev/null; then
+    echo "Loading environment variables from Vault CLI..."
+    eval $(vault kv get -format=json secret/env | jq -r '.data | to_entries | .[] | "export \(.key)=\(.value)"')
+  else
+    echo "ERROR: Vault CLI is not installed."
+    exit 1
+  fi
+elif [ -f .env ]; then
   source .env
 else
   echo "ERROR: .env file not found."
@@ -10,12 +18,13 @@ else
 fi
 
 function usage {
-    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--ipa-server]"
+    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--ipa-server] [--ocp-ai-svc] [--load-from-vault]"
     echo "End-to-End: $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
     echo "Download Image: $0 --copy-image"
     echo "Copy Files: $0 --copy-files"
     echo "FreeIPA Server: $0 --ipa-server"
     echo "OCP AI Service: $0 --ocp-ai-svc"
+    echo "Load from Vault: $0 --load-from-vault"
     exit 1
 }
 
