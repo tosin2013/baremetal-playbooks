@@ -1,28 +1,30 @@
 #!/bin/bash
 # Usage: ./bootstrap.sh [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines]
 set -x 
-# Load environment variables from .env file
-if [ "$1" == "--load-from-vault" ]; then
-  if command -v hcp &> /dev/null; then
-    echo "Loading environment variables from HCP Vault..."
-    for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
-      if [ -z "${!var}" ]; then
-        value=$(hcp vault-secrets secrets open secret/env/${var})
-        if [ -n "$value" ]; then
-          export ${var}=$value
+function load_env_vars {
+  # Load environment variables from .env file
+  if [ "$1" == "--load-from-vault" ]; then
+    if command -v hcp &> /dev/null; then
+      echo "Loading environment variables from HCP Vault..."
+      for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
+        if [ -z "${!var}" ]; then
+          value=$(hcp vault-secrets secrets open secret/env/${var})
+          if [ -n "$value" ]; then
+            export ${var}=$value
+          fi
         fi
-      fi
-    done
+      done
+    else
+      echo "ERROR: HCP Vault CLI is not installed."
+      exit 1
+    fi
+  elif [ -f .env ]; then
+    source .env
   else
-    echo "ERROR: HCP Vault CLI is not installed."
+    echo "ERROR: .env file not found."
     exit 1
   fi
-elif [ -f .env ]; then
-  source .env
-else
-  echo "ERROR: .env file not found."
-  exit 1
-fi
+}
 
 function usage {
     echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--ipa-server] [--ocp-ai-svc] [--load-from-vault]"
@@ -60,7 +62,7 @@ SECRETS_FILE="vars/secrets.yml"
 PIPELINES_VARS="$(pwd)/vars/pipeline-variables.yaml"
 GITHUB_ACTIONS_VARS_FILE="vars/github-actions-vars.yml"
 FREEIPA_VARS_FILE="vars/freeipa-vars.yml"
-OCP_AI_SVC_VARS_FILE="vars/ocp-ai-svc-vars.yml"
+OCP_AI_SVC_VARS_FILE="vars/ocp4-ai-svc-universal.yml"
 
 
 # if yq not installed use ./yq path 
@@ -109,6 +111,8 @@ cat $OCP_AI_SVC_VARS_FILE
 for arg in "$@"
 do
     case $arg in
+        --load-from-vault)
+          load_env_vars --load-from-vault
         --push-ssh-key)
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-ssh-key.yaml -e "@$SECRETS_FILE"
         shift
