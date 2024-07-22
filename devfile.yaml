@@ -19,14 +19,6 @@ commands:
         kind: build
         isDefault: true
       component: tooling-container
-  - id: vault-install
-    exec:
-      commandLine: 'sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo && sudo yum install -y vault'
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: build
-        isDefault: false
-      component: tooling-container
   - id: molecule-test
     exec:
       label: "Molecule: Run Scenario for Backup Role"
