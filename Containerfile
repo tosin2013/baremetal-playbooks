@@ -32,10 +32,6 @@ pip3 install --progress-bar=off \
 mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles && \
 rm -rf $(pip3 cache dir) && \
 yum install -y sshpass openssl wget tar && \  
-wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
-tar -xvzf vault.tar.gz && mkdir /home/runner/bin && \
-mv vault /home/runner/bin/vault && \
-rm vault.tar.gz && \
 # Avoid "fatal: detected dubious ownership in repository at" with newer git versions
 # See https://github.com/actions/runner-images/issues/6775
 git config --system --add safe.directory / && \
