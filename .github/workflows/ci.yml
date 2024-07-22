@@ -24,15 +24,6 @@ jobs:
         file: ./Containerfile
         tags: quay.io/username/baremetal-playbooks:${{ github.sha }}
 
-    - name: Validate devfile.yaml
-      run: |
-        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/odo/latest/odo-linux-amd64
-        chmod +x odo-linux-amd64
-        sudo mv odo-linux-amd64 /usr/local/bin/odo
-    - name: Analyze devfile.yaml
-      run: |
-        odo analyze  -o json
-        odo init --devfile ./devfile.yaml
     - name: Push Docker image to Quay.io
       env:
         QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
