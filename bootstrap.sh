@@ -5,7 +5,14 @@ set -x
 if [ "$1" == "--load-from-vault" ]; then
   if command -v vault &> /dev/null; then
     echo "Loading environment variables from Vault CLI..."
-    eval $(vault kv get -format=json secret/env | jq -r '.data | to_entries | .[] | "export \(.key)=\(.value)"')
+    for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
+      if [ -z "${!var}" ]; then
+        value=$(vault kv get -field=${var} secret/env)
+        if [ -n "$value" ]; then
+          export ${var}=$value
+        fi
+      fi
+    done
   else
     echo "ERROR: Vault CLI is not installed."
     exit 1
