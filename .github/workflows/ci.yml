@@ -22,7 +22,7 @@ jobs:
       with:
         context: .
         file: ./Containerfile
-        tags: baremetal-playbooks:latest
+        tags: quay.io/username/baremetal-playbooks:latest
 
     - name: Validate devfile.yaml
       run: |
@@ -33,3 +33,7 @@ jobs:
       run: |
         odo analyze  -o json
         odo init --devfile ./devfile.yaml
+    - name: Push Docker image to Quay.io
+      run: |
+        docker login -u ${{ secrets.QUAY_USERNAME }} -p ${{ secrets.QUAY_PASSWORD }} quay.io
+        docker push quay.io/username/baremetal-playbooks:latest
