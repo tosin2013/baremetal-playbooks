@@ -27,7 +27,7 @@ COPY _build/.bashrc /home/runner/.bashrc
 RUN microdnf install --assumeyes ncurses && \
     microdnf clean all && \
     pip3 install --progress-bar=off -r requirements.txt && \
-    mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles && \
+    mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles /usr/share/ansible/collections && \
     rm -rf $(pip3 cache dir) && \
     microdnf install -y sshpass openssl wget tar && \
     wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
@@ -55,7 +55,7 @@ RUN for dir in \
       /etc/group ; \
     do touch $file ; chmod g+rw $file ; chgrp root $file ; done
 
-COPY collections/ /usr/share/ansible/collections
+#COPY collections/ /usr/share/ansible/collections
 
 # Add some helpful CLI commands to check versions
 RUN set -ex \
