@@ -34,6 +34,9 @@ jobs:
         odo analyze  -o json
         odo init --devfile ./devfile.yaml
     - name: Push Docker image to Quay.io
+      env:
+        QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
       run: |
         docker login -u ${{ secrets.QUAY_USERNAME }} -p ${{ secrets.QUAY_PASSWORD }} quay.io
-        docker push quay.io/username/baremetal-playbooks:latest
+        docker push quay.io/${{ secrets.QUAY_USERNAME }}/baremetal-playbooks:latest
