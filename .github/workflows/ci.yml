@@ -23,6 +23,9 @@ jobs:
         context: .
         file: ./Containerfile
         tags: quay.io/takinosh/baremetal-playbooks:${{ github.sha }}
+    
+    - name: Display Docker image
+      run: docker images
 
     - name: Push Docker image to Quay.io
       env:
