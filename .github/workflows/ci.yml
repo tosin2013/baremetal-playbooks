@@ -29,7 +29,6 @@ jobs:
       with:
         context: .
         file: ./Containerfile
-        platforms: linux/amd64,linux/arm64
         push: true
         tags: quay.io/takinosh/baremetal-playbooks:${{ github.sha }}
     
