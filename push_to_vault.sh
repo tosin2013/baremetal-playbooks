@@ -2,8 +2,27 @@
 
 # Check if the file argument is provided
 if [ -z "$1" ]; then
-  echo "Usage: $0 <env_file>"
+  echo "Usage: $0 <env_file> [--login]"
   exit 1
+fi
+
+# Check if Vault CLI is installed
+if ! command -v vault &> /dev/null; then
+  echo "Vault CLI is not installed. Installing..."
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install vault
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt-get update && sudo apt-get install -y vault
+  else
+    echo "Unsupported OS. Please install Vault CLI manually."
+    exit 1
+  fi
+fi
+
+# Check if the --login flag is provided
+if [ "$2" == "--login" ]; then
+  echo "Logging into Vault..."
+  vault login
 fi
 
 # Read the env file line by line
