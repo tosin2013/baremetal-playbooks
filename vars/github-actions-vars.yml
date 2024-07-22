@@ -9,7 +9,7 @@ json_body:
   ref: "{{ workflow_ref }}"
   inputs:
     hostname: server.example.com
-    target_server: rhel8-equinix
+    target_server: rhel9-equinix
     forwarder: 1.1.1.1
     domain: example.com
 
