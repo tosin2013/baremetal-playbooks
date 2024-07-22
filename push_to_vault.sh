@@ -13,6 +13,8 @@ if ! command -v vault &> /dev/null; then
     brew install vault
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt-get update && sudo apt-get install -y vault
+  elif [[ -f /etc/redhat-release ]]; then
+    sudo yum install -y vault
   else
     echo "Unsupported OS. Please install Vault CLI manually."
     exit 1
