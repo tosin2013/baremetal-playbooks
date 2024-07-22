@@ -31,8 +31,8 @@ RUN microdnf install --assumeyes ncurses && \
     rm -rf $(pip3 cache dir) && \
     yum install -y sshpass openssl wget tar && \
     wget https://github.com/hashicorp/vault/archive/refs/tags/v1.17.2.tar.gz -O vault.tar.gz && \
-    tar -xvzf vault.tar.gz && mkdir /home/runner/bin && \
-    mv vault /home/runner/bin/vault && \
+    tar -xvzf vault.tar.gz  && \
+    mv vault /usr/local/bin/vault && \
     rm vault.tar.gz && \
     git config --system --add safe.directory / && \
     printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
