@@ -22,7 +22,7 @@ jobs:
       with:
         context: .
         file: ./Containerfile
-        tags: quay.io/username/baremetal-playbooks:${{ github.sha }}
+        tags: quay.io/takinosh/baremetal-playbooks:${{ github.sha }}
 
     - name: Push Docker image to Quay.io
       env:
