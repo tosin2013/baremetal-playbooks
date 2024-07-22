@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Containerfile
+        tags: local-test-image:latest
+
+    - name: Validate devfile.yaml
+      run: |
+        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/odo/latest/odo-linux-amd64
+        chmod +x odo-linux-amd64
+        sudo mv odo-linux-amd64 /usr/local/bin/odo
+        odo catalog list components
+        odo create --devfile ./devfile.yaml --project myproject --context .
+
+    - name: Run tests inside container
+      run: |
+        docker run --rm local-test-image:latest pytest
