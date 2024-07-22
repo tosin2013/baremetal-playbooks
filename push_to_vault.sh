@@ -6,12 +6,12 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-# Check if Vault CLI is installed
+# Check if HCP Vault CLI is installed
 
 # Check if the --login flag is provided
 if [ "$2" == "--login" ]; then
-  echo "Logging into Vault..."
-  vault login
+  echo "Logging into HCP Vault..."
+  hcp vault-secrets login
 fi
 
 # Read the env file line by line
@@ -25,6 +25,6 @@ while IFS= read -r line; do
   key=$(echo "$line" | cut -d'=' -f1)
   value=$(echo "$line" | cut -d'=' -f2-)
 
-  # Push the key-value pair to Vault
-  vault kv put "secret/env/$key" value="$value"
+  # Push the key-value pair to HCP Vault
+  hcp vault-secrets secrets put "secret/env/$key" value="$value"
 done < "$1"
