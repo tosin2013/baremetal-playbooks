@@ -31,6 +31,7 @@ pip3 install --progress-bar=off \
 -r requirements.txt && \
 mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles && \
 rm -rf $(pip3 cache dir) && \
+yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo && \
 yum install -y sshpass openssl vault && \  # Install sshpass openssl vault
 # Avoid "fatal: detected dubious ownership in repository at" with newer git versions
 # See https://github.com/actions/runner-images/issues/6775
