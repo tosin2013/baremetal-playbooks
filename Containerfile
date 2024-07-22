@@ -34,6 +34,10 @@ RUN microdnf install --assumeyes ncurses && \
     unzip vault_1.17.2_linux_amd64.zip   && \
     mv vault /usr/local/bin/vault && \
     rm vault_1.17.2_linux_amd64.zip   && \
+    wget https://releases.hashicorp.com/hcp/0.4.0/hcp_0.4.0_linux_amd64.zip -O hcp_0.4.0_linux_amd64.zip  && \
+    unzip hcp_0.4.0_linux_amd64.zip   && \
+    mv hcp /usr/local/bin/hcp && \
+    rm hcp_0.4.0_linux_amd64.zip   && \
     git config --system --add safe.directory / && \
     printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
 
