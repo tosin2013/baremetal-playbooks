@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, rhel]
 
     steps:
     - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
       with:
         context: .
         file: ./Containerfile
-        tags: local-test-image:latest
+        tags: baremetal-playbooks:latest
 
     - name: Validate devfile.yaml
       run: |
