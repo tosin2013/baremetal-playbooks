@@ -7,19 +7,6 @@ if [ -z "$1" ]; then
 fi
 
 # Check if Vault CLI is installed
-if ! command -v vault &> /dev/null; then
-  echo "Vault CLI is not installed. Installing..."
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    brew install vault
-  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    sudo apt-get update && sudo apt-get install -y vault
-  elif [[ -f /etc/redhat-release ]]; then
-    sudo yum install -y vault
-  else
-    echo "Unsupported OS. Please install Vault CLI manually."
-    exit 1
-  fi
-fi
 
 # Check if the --login flag is provided
 if [ "$2" == "--login" ]; then
