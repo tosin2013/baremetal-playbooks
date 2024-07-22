@@ -41,7 +41,8 @@ RUN microdnf install --assumeyes ncurses && \
     curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
     mv yq_linux_amd64 yq && chmod +x yq && mv yq /usr/local/bin &&  \
     git config --system --add safe.directory / && \
-    printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
+    printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc && \
+    ansible-galaxy collection install ansible.builtin
 
 # Ensure directories are writable by root group
 RUN for dir in \
