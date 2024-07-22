@@ -36,18 +36,9 @@ pip3 install -r requirements.txt
 **Optional: Login to Vault**
 If you plan to use the `--load-from-vault` flag in the `bootstrap.sh` script, ensure you are logged into Vault:
 ```
-export VAULT_ADDRESS=https://auth.idp.hashicorp.com/oauth2/token
 export HCP_CLIENT_ID=your_client_id
 export HCP_CLIENT_SECRET=your_client_secret
-HCP_API_TOKEN=$(curl --location "https://auth.idp.hashicorp.com/oauth2/token" \
---header "Content-Type: application/x-www-form-urlencoded" \
---data-urlencode "client_id=$HCP_CLIENT_ID" \
---data-urlencode "client_secret=$HCP_CLIENT_SECRET" \
---data-urlencode "grant_type=client_credentials" \
---data-urlencode "audience=https://api.hashicorp.cloud" | jq -r .access_token)
-echo "HCP_API_TOKEN=$HCP_API_TOKEN"
-export VAULT_TOKEN=$HCP_API_TOKEN
-vault login
+export USE_VAULT=true
 ```
 
 ## Playbooks
