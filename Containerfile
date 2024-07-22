@@ -55,7 +55,7 @@ RUN for dir in \
       /etc/group ; \
     do touch $file ; chmod g+rw $file ; chgrp root $file ; done
 
-COPY collections/ /usr/share/ansible/collections
+#COPY collections/ /usr/share/ansible/collections
 
 # Add some helpful CLI commands to check versions
 RUN set -ex \
