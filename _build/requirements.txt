@@ -3,7 +3,7 @@
 cython>=3.0.5; python_version >= "3.12"
 # ordered:
 ansible-pylibssh==1.1.0
-ansible-runner==2.3.6
+ansible-runner==2.4.0
 ansible-lint[lock]==6.21.1
 molecule==6.0.2
 molecule-plugins[podman]==23.5.0
