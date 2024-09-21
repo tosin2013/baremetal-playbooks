@@ -22,7 +22,7 @@ function load_env_vars {
       echo "ERROR: HCP Vault CLI is not installed."
       exit 1
     fi
-  elif [ -f .env ]; then
+  if [ -f .env ]; then
     source .env
   else
     echo "ERROR: .env file not found."
