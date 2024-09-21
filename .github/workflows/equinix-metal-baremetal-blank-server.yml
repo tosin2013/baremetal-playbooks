@@ -1,0 +1,43 @@
+name: Equinix Metal baremetal Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python and Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip jq
+          pip3 install -r requirements.txt
+
+      - name: Set Up HCP CLI
+        if: contains(github.event.inputs.args, '--load-from-vault')
+        run: |
+          curl -fsSL https://cli.replicated.com/install.sh | sh
+          hcp profile init --vault-secrets
+
+      - name: Set Executable Permissions
+        run: chmod +x bootstrap.sh
+
+      - name: Run Bootstrap Script
+        env:
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          USE_VAULT: ${{ secrets.USE_VAULT }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
+          OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
+          # Add other necessary environment variables here
+        run: ./bootstrap.sh ${{ github.event.inputs.args }}
