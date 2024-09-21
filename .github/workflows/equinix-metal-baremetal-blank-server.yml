@@ -82,4 +82,4 @@ jobs:
           FREEIPA_SERVER_FQDN: ${{ github.event.inputs.FREEIPA_SERVER_FQDN }}
           FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
           # Add other necessary environment variables here
-        run: ./baremetal.sh
+        run: ./bootstrap.sh
