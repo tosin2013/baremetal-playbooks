@@ -10,6 +10,15 @@ on:
         description: 'Local Vault Configuration'
         required: false
         default: ''
+        type: choice
+        options:
+          - 'option1'
+          - 'option2'
+      use-emoji:
+        type: boolean
+        description: 'Include 🎉🤣 emojis'
+      environment:
+        type: environment
 
 jobs:
   bootstrap:
@@ -53,5 +62,7 @@ jobs:
           NEW_FORWARDER: ${{ github.event.inputs.local-vault.NEW_FORWARDER }}
           FREEIPA_SERVER_FQDN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_FQDN }}
           FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_DOMAIN }}
+          USE_EMOJI: ${{ github.event.inputs.use-emoji }}
+          ENVIRONMENT: ${{ github.event.inputs.environment }}
           # Add other necessary environment variables here
         run: ./baremetal.sh
