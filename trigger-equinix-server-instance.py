@@ -1,3 +1,4 @@
+import argparse
 import requests
 import os
 import nacl.encoding
@@ -43,6 +44,10 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     update_secret_response.raise_for_status()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
+    parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=True)
+    args = parser.parse_args()
+    
     repo_owner = "your_github_username"
     repo_name = "your_repo_name"
     workflow_id = "equinix-metal-baremetal-blank-server.yml"
@@ -57,7 +62,7 @@ if __name__ == "__main__":
         "FREEIPA_SERVER_DOMAIN": "example.com"
     }
     
-    ssh_password = generate_ssh_password()
+    ssh_password = args.ssh_password
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     inputs["SSH_PASSWORD"] = ssh_password
     
