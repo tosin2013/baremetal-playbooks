@@ -67,18 +67,7 @@ jobs:
           HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
           USE_VAULT: ${{ secrets.USE_VAULT }}
-          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
-          OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          FREEIPA_SERVER_ADMIN_PASSWORD: ${{ secrets.FREEIPA_SERVER_ADMIN_PASSWORD }}
-          NEW_HOST: ${{ github.event.inputs.NEW_HOST }}
-          NEW_USERNAME: ${{ github.event.inputs.NEW_USERNAME }}
-          NEW_DOMAIN: ${{ github.event.inputs.NEW_DOMAIN }}
-          NEW_FORWARDER: ${{ github.event.inputs.NEW_FORWARDER }}
-          FREEIPA_SERVER_FQDN: ${{ github.event.inputs.FREEIPA_SERVER_FQDN }}
-          FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
         run: |
           source .env
           cat .env
