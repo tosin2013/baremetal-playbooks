@@ -6,19 +6,36 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      local-vault:
-        description: 'Local Vault Configuration'
-        required: false
-        default: ''
-        type: choice
-        options:
-          - 'option1'
-          - 'option2'
-      use-emoji:
-        type: boolean
-        description: 'Include 🎉🤣 emojis'
-      environment:
-        type: environment
+      NEW_HOST:
+        description: 'New Server Host'
+        required: true
+        type: string
+        default: 'new_server.example.com'
+      NEW_USERNAME:
+        description: 'New Server Username'
+        required: true
+        type: string
+        default: 'new_admin'
+      NEW_DOMAIN:
+        description: 'New Domain'
+        required: true
+        type: string
+        default: 'example.com'
+      NEW_FORWARDER:
+        description: 'New Forwarder'
+        required: true
+        type: string
+        default: '8.8.8.8'
+      FREEIPA_SERVER_FQDN:
+        description: 'FreeIPA Server FQDN'
+        required: true
+        type: string
+        default: 'ipa.example.com'
+      FREEIPA_SERVER_DOMAIN:
+        description: 'FreeIPA Server Domain'
+        required: true
+        type: string
+        default: 'example.com'
 
 jobs:
   bootstrap:
@@ -35,7 +52,7 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Set Up HCP CLI
-        if: contains(github.event.inputs.args, '--load-from-vault')
+        if: contains(github.event.inputs, '--load-from-vault')
         run: |
           curl -fsSL https://cli.replicated.com/install.sh | sh
           hcp profile init --vault-secrets
@@ -56,13 +73,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
           OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
-          NEW_HOST: ${{ github.event.inputs.local-vault.NEW_HOST }}
-          NEW_USERNAME: ${{ github.event.inputs.local-vault.NEW_USERNAME }}
-          NEW_DOMAIN: ${{ github.event.inputs.local-vault.NEW_DOMAIN }}
-          NEW_FORWARDER: ${{ github.event.inputs.local-vault.NEW_FORWARDER }}
-          FREEIPA_SERVER_FQDN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_FQDN }}
-          FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_DOMAIN }}
-          USE_EMOJI: ${{ github.event.inputs.use-emoji }}
-          ENVIRONMENT: ${{ github.event.inputs.environment }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          FREEIPA_SERVER_ADMIN_PASSWORD: ${{ secrets.FREEIPA_SERVER_ADMIN_PASSWORD }}
+          NEW_HOST: ${{ github.event.inputs.NEW_HOST }}
+          NEW_USERNAME: ${{ github.event.inputs.NEW_USERNAME }}
+          NEW_DOMAIN: ${{ github.event.inputs.NEW_DOMAIN }}
+          NEW_FORWARDER: ${{ github.event.inputs.NEW_FORWARDER }}
+          FREEIPA_SERVER_FQDN: ${{ github.event.inputs.FREEIPA_SERVER_FQDN }}
+          FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
           # Add other necessary environment variables here
         run: ./baremetal.sh
