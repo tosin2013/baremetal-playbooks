@@ -62,6 +62,5 @@ if __name__ == "__main__":
     
     ssh_password = args.ssh_password
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
-    inputs["SSH_PASSWORD"] = ssh_password
     
     trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
