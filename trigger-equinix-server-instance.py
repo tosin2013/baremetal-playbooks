@@ -46,8 +46,8 @@ if __name__ == "__main__":
     parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=True)
     args = parser.parse_args()
     
-    repo_owner = "your_github_username"
-    repo_name = "your_repo_name"
+    repo_owner = "tosin2013"
+    repo_name = "baremetal-playbooks"
     workflow_id = "equinix-metal-baremetal-blank-server.yml"
     token = os.getenv("GITHUB_TOKEN")
     
