@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      local-vault:
+        description: 'Local Vault Configuration'
+        required: false
+        default: ''
 
 jobs:
   bootstrap:
@@ -42,5 +47,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
           OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
+          NEW_HOST: ${{ github.event.inputs.local-vault.NEW_HOST }}
+          NEW_USERNAME: ${{ github.event.inputs.local-vault.NEW_USERNAME }}
+          NEW_DOMAIN: ${{ github.event.inputs.local-vault.NEW_DOMAIN }}
+          NEW_FORWARDER: ${{ github.event.inputs.local-vault.NEW_FORWARDER }}
+          FREEIPA_SERVER_FQDN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_FQDN }}
+          FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.local-vault.FREEIPA_SERVER_DOMAIN }}
           # Add other necessary environment variables here
         run: ./baremetal.sh
