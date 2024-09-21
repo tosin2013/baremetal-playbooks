@@ -29,7 +29,10 @@ jobs:
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
 
-      - name: Run Bootstrap Script
+      - name: Set Executable Permissions for baremetal.sh
+        run: chmod +x baremetal.sh
+
+      - name: Run baremetal.sh Script
         env:
           HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
@@ -40,4 +43,4 @@ jobs:
           KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
           OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
           # Add other necessary environment variables here
-        run: ./bootstrap.sh ${{ github.event.inputs.args }}
+        run: ./baremetal.sh
