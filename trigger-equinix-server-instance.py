@@ -18,8 +18,6 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
     response = requests.post(url, headers=headers, json=data)
     response.raise_for_status()
 
-def generate_ssh_password():
-    return nacl.utils.random(16).decode('utf-8')
 
 def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token):
     public_key_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/public-key"
