@@ -48,14 +48,6 @@ jobs:
           sudo apt-get install -y python3-pip jq
           pip3 install -r requirements.txt
 
-      - name: Configure Vault Login
-        run: |
-          echo "Configuring Vault login..."
-        env:
-          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
-          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
-          USE_VAULT: true
-
       - name: Set Up HCP CLI
         run: |
           sudo apt-get update && \
