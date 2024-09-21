@@ -52,24 +52,27 @@ jobs:
           pip3 install -r requirements.txt
 
       - name: Set Up HCP CLI
-        if: contains(github.event.inputs, '--load-from-vault')
         run: |
           curl -fsSL https://cli.replicated.com/install.sh | sh
           hcp profile init --vault-secrets
 
+      - name: Configure Vault Login
+        run: |
+          echo "Configuring Vault login..."
+        env:
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          USE_VAULT: true
+
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
 
-      - name: Set Executable Permissions for baremetal.sh
-        run: chmod +x baremetal.sh
-
-      - name: Run baremetal.sh Script
+      - name: Run bootstrap.sh Script
         env:
           HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
           USE_VAULT: ${{ secrets.USE_VAULT }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
           OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
@@ -81,5 +84,4 @@ jobs:
           NEW_FORWARDER: ${{ github.event.inputs.NEW_FORWARDER }}
           FREEIPA_SERVER_FQDN: ${{ github.event.inputs.FREEIPA_SERVER_FQDN }}
           FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
-          # Add other necessary environment variables here
-        run: ./bootstrap.sh
+        run: ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault
