@@ -89,4 +89,5 @@ jobs:
           FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
         run: |
           source .env
-          ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault
+          cat .env
+          bash -x ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault || exit $?
