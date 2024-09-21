@@ -1,0 +1,92 @@
+name: Equinix Metal baremetal Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      NEW_HOST:
+        description: 'New Server Host'
+        required: true
+        type: string
+        default: 'new_server.example.com'
+      NEW_USERNAME:
+        description: 'New Server Username'
+        required: true
+        type: string
+        default: 'new_admin'
+      NEW_DOMAIN:
+        description: 'New Domain'
+        required: true
+        type: string
+        default: 'example.com'
+      NEW_FORWARDER:
+        description: 'New Forwarder'
+        required: true
+        type: string
+        default: '8.8.8.8'
+      FREEIPA_SERVER_FQDN:
+        description: 'FreeIPA Server FQDN'
+        required: true
+        type: string
+        default: 'ipa.example.com'
+      FREEIPA_SERVER_DOMAIN:
+        description: 'FreeIPA Server Domain'
+        required: true
+        type: string
+        default: 'example.com'
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python and Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip jq
+          pip3 install -r requirements.txt
+
+      - name: Configure Vault Login
+        run: |
+          echo "Configuring Vault login..."
+        env:
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          USE_VAULT: true
+
+      - name: Set Up HCP CLI
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install wget gpg coreutils
+          wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt-get update && sudo apt-get install hcp
+
+      - name: Copy env.sample.vaultproject to .env
+        run: cp env.sample.vaultproject .env
+
+      - name: Set Executable Permissions
+        run: chmod +x bootstrap.sh
+
+      - name: Run bootstrap.sh Script
+        env:
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          USE_VAULT: ${{ secrets.USE_VAULT }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KCLI_PIPELINES_GITHUB_TOKEN: ${{ secrets.KCLI_PIPELINES_GITHUB_TOKEN }}
+          OCP_AI_SVC_PIPELINES_GITHUB_TOKEN: ${{ secrets.OCP_AI_SVC_PIPELINES_GITHUB_TOKEN }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          FREEIPA_SERVER_ADMIN_PASSWORD: ${{ secrets.FREEIPA_SERVER_ADMIN_PASSWORD }}
+          NEW_HOST: ${{ github.event.inputs.NEW_HOST }}
+          NEW_USERNAME: ${{ github.event.inputs.NEW_USERNAME }}
+          NEW_DOMAIN: ${{ github.event.inputs.NEW_DOMAIN }}
+          NEW_FORWARDER: ${{ github.event.inputs.NEW_FORWARDER }}
+          FREEIPA_SERVER_FQDN: ${{ github.event.inputs.FREEIPA_SERVER_FQDN }}
+          FREEIPA_SERVER_DOMAIN: ${{ github.event.inputs.FREEIPA_SERVER_DOMAIN }}
+        run: |
+          source .env
+          ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault

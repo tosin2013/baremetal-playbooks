@@ -29,7 +29,7 @@ RUN microdnf install --assumeyes ncurses && \
     pip3 install --progress-bar=off -r requirements.txt && \
     mkdir -p ~/.ansible/roles /usr/share/ansible/roles /etc/ansible/roles /usr/share/ansible/collections && \
     rm -rf $(pip3 cache dir) && \
-    microdnf install -y sshpass openssl wget unzip && \
+    microdnf install -y sshpass openssl wget unzip jq && \
     wget https://releases.hashicorp.com/vault/1.17.2/vault_1.17.2_linux_amd64.zip -O vault_1.17.2_linux_amd64.zip  && \
     unzip vault_1.17.2_linux_amd64.zip   && \
     mv vault /usr/local/bin/vault && \
@@ -38,8 +38,15 @@ RUN microdnf install --assumeyes ncurses && \
     unzip hcp_0.4.0_linux_amd64.zip   && \
     mv hcp /usr/local/bin/hcp && \
     rm hcp_0.4.0_linux_amd64.zip   && \
+    curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
+    mv yq_linux_amd64 yq && chmod +x yq && mv yq /usr/local/bin &&  \
     git config --system --add safe.directory / && \
-    printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc
+    printf "export CONTAINER_NAME=$CONTAINER_NAME\n" >> /home/runner/.bashrc && \
+<<<<<<< HEAD
+    ansible-galaxy collection install -r _build/requirements.yml
+=======
+    ansible-galaxy collection install -r /tmp/requirements.yml
+>>>>>>> 36188c9bc6ede6ebc469506ba5379aa93c5c483d
 
 # Ensure directories are writable by root group
 RUN for dir in \
@@ -59,7 +66,6 @@ RUN for dir in \
       /etc/group ; \
     do touch $file ; chmod g+rw $file ; chgrp root $file ; done
 
-#COPY collections/ /usr/share/ansible/collections
 
 # Add some helpful CLI commands to check versions
 RUN set -ex \
