@@ -4,7 +4,7 @@
   gather_facts: no  # No need to gather facts
 
   vars:
-    variables_file: "pipeline-variables.yaml"
+    variables_file: "vars/pipeline-variables.yaml"
 
   tasks:
     - name: Copy variables file to remote server

@@ -25,6 +25,14 @@
         url: http://downloads.openshift-console.svc.cluster.local/amd64/linux/oc
         dest: "{{ molecule_user_home_dir }}/bin/oc"
         mode: '0770'
+      when: ansible_os_family != "RedHat"
+
+    - name: Download oc binary for RHEL
+      ansible.builtin.get_url:
+        url: http://downloads.openshift-console.svc.cluster.local/amd64/linux/oc
+        dest: "{{ molecule_user_home_dir }}/bin/oc"
+        mode: '0770'
+      when: ansible_os_family == "RedHat"
     
     - name: Add another bin dir to system-wide $PATH.
       ansible.builtin.lineinfile:

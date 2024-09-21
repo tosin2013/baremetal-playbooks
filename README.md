@@ -1,4 +1,4 @@
-# Ansible Creator Execution Environment
+# Baremetal Lab GitHub Actions Workflows
 
 This is a container (execution environment) aimed towards being used
 for the development and testing of the Ansible content. We should also mention
@@ -26,12 +26,19 @@ We use [taskfile](https://taskfile.dev/) as build tool, so you should run
 set of build tasks. If these are passing, you are ready to open a pull request
 with your changes.
 
-## Prerequesites
+## Prerequisites
+
+**Install pip packages**
 ```
-curl -OL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-mv yq_linux_amd64 yq
-chmod +x yq
-$ sudo mv yq /usr/local/bin
+pip3 install -r requirements.txt
+```
+
+**Optional: Login to Vault**
+If you plan to use the `--load-from-vault` flag in the `bootstrap.sh` script, ensure you are logged into Vault:
+```
+export HCP_CLIENT_ID=your_client_id
+export HCP_CLIENT_SECRET=your_client_secret
+export USE_VAULT=true
 ```
 
 ## Playbooks
@@ -51,21 +58,6 @@ This code selection consists of a series of commands written in Markdown format.
 6. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
 
 7. `ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `populate-hostnames-on-freeipa.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
-
-Please note that the file path for this code selection is `/Users/takinosh/workspace/baremetal-playbooks/README.md`.
-`./copy-ssh-id-and-test.sh admin@example.com"`
-
-`ansible-playbook -i hosts  playbooks/syntax_highlighting_demo.yml  -e "@secrets.yml"`
-
-`ansible-playbook -i hosts  playbooks/push-ssh-key.yaml  -e "@secrets.yml"`
-
-`ansible-playbook -i hosts  playbooks/push-pipeline-variables.yaml  -e "variables_file=/projects/baremetal-playbooks/pipeline-variables.yaml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@github-actions-vars.yml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@kcli-openshift4-baremetal-vars.yml"`
-
-`ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`
 
 
 # ansible-galaxy collection install community.general

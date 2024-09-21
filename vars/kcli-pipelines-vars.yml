@@ -1,7 +1,7 @@
 # GitHub configuration
 github_token: 'your_github_personal_access_token'  # Your GitHub token with appropriate permissions
 github_repo: 'tosin2013/kcli-pipelines'        # GitHub repository in the format 'username/repo'
-workflow_file_name: 'configure-rhel8-equinix.yaml' # Name of the workflow file
+workflow_file_name: 'configure-rhel9-equinix.yaml' # Name of the workflow file
 workflow_ref: 'main'                               # Branch or tag name on which to trigger the workflow
 
 # (Optional) If your workflow requires inputs, define them here

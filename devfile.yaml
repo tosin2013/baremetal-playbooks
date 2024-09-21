@@ -1,10 +1,10 @@
-schemaVersion: 2.2.0
+schemaVersion: 2.2.2
 metadata:
   name: baremetal-playbooks
 components:
   - name: tooling-container
     container:
-      image: quay.io/devspaces/ansible-creator-ee@sha256:3781b800f9a91ee1e2d3fcfc0d50b3f09b60e880f82efa90a021d7e2ebe1d659
+      image: quay.io/takinosh/baremetal-playbooks:7498dfd42aa189d645937ba3900b5f48ca9b1228 #quay.io/devspaces/ansible-creator-ee@sha256:5d9bc07920753cfd1aafcab21358060d08f846865d5dd75a02941787471c838c
       memoryRequest: 256M
       memoryLimit: 6Gi
       cpuRequest: 250m
@@ -44,10 +44,7 @@ commands:
         if [ ! -d "$HOME/.cache/ansible-navigator" ]; then
           mkdir -p "$HOME/.cache/ansible-navigator"
         fi
-        cp /usr/local/lib/python3.11/site-packages/ansible_navigator/data/catalog_collections.py $HOME/.cache/ansible-navigator 
+        cp /usr/local/lib/python3.11/site-packages/ansible_navigator/data/catalog_collections.py $HOME/.cache/ansible-navigator
         ansible-navigator --ee false
       workingDir: ${PROJECTS_ROOT}/ansible-devspaces-demo
       component: tooling-container
-events:
-  postStart:
-    - "oc-install"
