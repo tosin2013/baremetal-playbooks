@@ -5,6 +5,7 @@
 
   vars:
     variables_file: "vars/pipeline-variables.yaml"
+    inputs: "{{ inputs }}"
 
   tasks:
     - name: Copy variables file to remote server
@@ -18,3 +19,22 @@
         path: "/tmp/config.yml"
         mode: '0644'
       when: copy_result.changed
+
+    - name: Update pipeline variables with new inputs
+      ansible.builtin.lineinfile:
+        path: "/tmp/config.yml"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        create: yes
+      loop:
+        - { regexp: '^rhsm_username:', line: "rhsm_username: {{ inputs.NEW_USERNAME }}" }
+        - { regexp: '^rhsm_password:', line: "rhsm_password: {{ inputs.NEW_PASSWORD }}" }
+        - { regexp: '^rhsm_org:', line: "rhsm_org: {{ inputs.NEW_ORG }}" }
+        - { regexp: '^rhsm_activationkey:', line: "rhsm_activationkey: {{ inputs.NEW_ACTIVATION_KEY }}" }
+        - { regexp: '^admin_user_password:', line: "admin_user_password: {{ inputs.ADMIN_USER_PASSWORD }}" }
+        - { regexp: '^offline_token:', line: "offline_token: {{ inputs.OFFLINE_TOKEN }}" }
+        - { regexp: '^openshift_pull_secret:', line: "openshift_pull_secret: {{ inputs.OPENSHIFT_PULL_SECRET }}" }
+        - { regexp: '^automation_hub_offline_token:', line: "automation_hub_offline_token: {{ inputs.AUTOMATION_HUB_OFFLINE_TOKEN }}" }
+        - { regexp: '^freeipa_server_admin_password:', line: "freeipa_server_admin_password: {{ inputs.FREEIPA_SERVER_ADMIN_PASSWORD }}" }
+        - { regexp: '^xrdp_remote_user:', line: "xrdp_remote_user: {{ inputs.XRDP_REMOTE_USER }}" }
+        - { regexp: '^xrdp_remote_user_password:', line: "xrdp_remote_user_password: {{ inputs.XRDP_REMOTE_USER_PASSWORD }}" }

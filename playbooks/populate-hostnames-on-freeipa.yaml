@@ -17,10 +17,10 @@
     - name: Ensure that dns record is Added
       community.general.ipa_dnsrecord:
         name: "{{ item.key }}"
-        zone_name:  "{{ freeipa_server_domain }}"
+        zone_name:  "{{ inputs.FREEIPA_SERVER_DOMAIN }}"
         record_type: 'A'
         record_value:  "{{ item.value }}"
-        ipa_host: "{{ freeipa_server_fqdn }}"
+        ipa_host: "{{ inputs.FREEIPA_SERVER_FQDN }}"
         ipa_user: admin
         ipa_pass:  "{{ freeipa_server_admin_password }}"
         state: present
