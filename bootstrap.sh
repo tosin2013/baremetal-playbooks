@@ -88,6 +88,7 @@ function usage {
 function debug_pipeline_vars {
   echo "Debugging pipeline-variables.yaml:"
   cat "$PIPELINES_VARS"
+  exit 1
 }
 
 function copy_dir_files {
