@@ -44,6 +44,12 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
     parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=True)
+    parser.add_argument('--new_host', type=str, help='New host name', required=True)
+    parser.add_argument('--new_username', type=str, help='New username', required=True)
+    parser.add_argument('--new_domain', type=str, help='New domain', required=True)
+    parser.add_argument('--new_forwarder', type=str, help='New forwarder IP', required=True)
+    parser.add_argument('--freeipa_server_fqdn', type=str, help='FreeIPA server FQDN', required=True)
+    parser.add_argument('--freeipa_server_domain', type=str, help='FreeIPA server domain', required=True)
     args = parser.parse_args()
     
     repo_owner = "tosin2013"
@@ -52,12 +58,12 @@ if __name__ == "__main__":
     token = os.getenv("GITHUB_TOKEN")
     
     inputs = {
-        "NEW_HOST": "new_server.example.com",
-        "NEW_USERNAME": "new_admin",
-        "NEW_DOMAIN": "example.com",
-        "NEW_FORWARDER": "8.8.8.8",
-        "FREEIPA_SERVER_FQDN": "ipa.example.com",
-        "FREEIPA_SERVER_DOMAIN": "example.com"
+        "NEW_HOST": args.new_host,
+        "NEW_USERNAME": args.new_username,
+        "NEW_DOMAIN": args.new_domain,
+        "NEW_FORWARDER": args.new_forwarder,
+        "FREEIPA_SERVER_FQDN": args.freeipa_server_fqdn,
+        "FREEIPA_SERVER_DOMAIN": args.freeipa_server_domain
     }
     
     ssh_password = args.ssh_password
