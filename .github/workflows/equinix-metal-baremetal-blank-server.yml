@@ -69,20 +69,20 @@ jobs:
       - name: Copy env.sample.vaultproject to .env and override default variables
         run: |
           cp env.sample.vaultproject .env
-          echo 'export NEW_HOST="new_server.example.com"' >> .env
-          echo 'export NEW_USERNAME="new_admin"' >> .env
-          echo 'export SSH_PASSWORD="password"' >> .env
-          echo 'export NEW_DOMAIN="example.com"' >> .env
-          echo 'export ZONE_NAME="example.com"' >> .env
-          echo 'export NEW_FORWARDER="8.8.8.8"' >> .env
+          echo 'export NEW_HOST="${{ inputs.NEW_HOST }}"' >> .env
+          echo 'export NEW_USERNAME="${{ inputs.NEW_USERNAME }}"' >> .env
+          echo 'export SSH_PASSWORD="${{ secrets.SSH_PASSWORD }}"' >> .env
+          echo 'export NEW_DOMAIN="${{ inputs.NEW_DOMAIN }}"' >> .env
+          echo 'export ZONE_NAME="${{ inputs.NEW_DOMAIN }}"' >> .env
+          echo 'export NEW_FORWARDER="${{ inputs.NEW_FORWARDER }}"' >> .env
           echo 'export CICD_ENVIORNMENT="github"' >> .env
           echo 'export USE_ROUTE53=true' >> .env
-          echo 'export FREEIPA_SERVER_FQDN="ipa.${GUID}.example.com"' >> .env
-          echo 'export FREEIPA_SERVER_DOMAIN="${GUID}.example.com"' >> .env
+          echo 'export FREEIPA_SERVER_FQDN="ipa.${{ inputs.GUID }}.example.com"' >> .env
+          echo 'export FREEIPA_SERVER_DOMAIN="${{ inputs.GUID }}.example.com"' >> .env
           echo 'export FREEIPA_SERVER_ADMIN_PASSWORD="CHANGEME"' >> .env
           echo 'export USE_VAULT=true' >> .env
-          echo 'export GUID=GUID' >> .env
-          echo 'export OLLAMA="true"' >> .env
+          echo 'export GUID="${{ inputs.GUID }}"' >> .env
+          echo 'export OLLAMA="${{ inputs.OLLAMA }}"' >> .env
 
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
