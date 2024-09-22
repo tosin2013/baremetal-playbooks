@@ -53,10 +53,19 @@ function load_env_vars {
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
-      hcp profile init --vault-secrets
+      
+      # Initialize HCP profile non-interactively
+      hcp profile init --vault-secrets \
+        --client-id="$HCP_CLIENT_ID" \
+        --client-secret="$HCP_CLIENT_SECRET"  || {
+          echo "ERROR: Failed to initialize HCP profile."
+          exit 1
+        }
+
+      # Fetch secrets from Vault
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
         if [ -z "${!var:-}" ]; then
-          value=$(hcp vault-secrets secrets open ${var} --format=json --app=qubinode-env-files | jq -r .static_version.value) || {
+          value=$(hcp vault-secrets secrets open "${var}" --format=json --app=qubinode-env-files | jq -r .static_version.value) || {
             echo "ERROR: Failed to retrieve ${var} from Vault."
             exit 1
           }
@@ -70,6 +79,7 @@ function load_env_vars {
           echo "Environment variable ${var} is already set. Skipping Vault retrieval."
         fi
       done
+
       if [ -f .env ]; then
         echo "Sourcing .env file..."
         source .env
@@ -90,6 +100,7 @@ function load_env_vars {
     fi
   fi
 }
+
 
 # Function to check required environment variables
 function check_env_vars {
