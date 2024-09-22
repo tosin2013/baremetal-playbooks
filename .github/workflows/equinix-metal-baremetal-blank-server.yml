@@ -33,6 +33,16 @@ on:
         required: true
         type: string
         default: 'example.com'
+      GUID:
+        description: 'GUID'
+        required: true
+        type: string
+        default: 'default_guid'
+      OLLAMA:
+        description: 'OLLAMA'
+        required: true
+        type: string
+        default: 'default_ollama'
 
 jobs:
   bootstrap:
@@ -68,6 +78,8 @@ jobs:
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
           USE_VAULT: ${{ secrets.USE_VAULT }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          GUID: ${{ inputs.GUID }}
+          OLLAMA: ${{ inputs.OLLAMA }}
         run: |
           source .env
           cat .env
