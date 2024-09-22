@@ -9,7 +9,7 @@ function load_env_vars {
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
       hcp profile init --vault-secrets
-      for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
+      for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
         if [ -z "${!var}" ]; then
           value=$(hcp vault-secrets secrets open ${var} --format=json  --app=qubinode-env-files | jq -r .static_version.value || exit 1)
           if [ -n "$value" ]; then
@@ -33,7 +33,7 @@ function load_env_vars {
 }
 
 function check_env_vars {
-  for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
+  for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
     if [ -z "${!var}" ]; then
       echo "ERROR: Environment variable $var is not set."
       exit 1
