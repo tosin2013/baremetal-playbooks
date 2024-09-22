@@ -86,6 +86,9 @@ jobs:
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
 
+      - name: Copy SSH Key to Target Host
+        run: ./copy-ssh-id-and-test.sh "${{ inputs.NEW_HOST }}"
+
       - name: Run bootstrap.sh Script
         env:
           HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}

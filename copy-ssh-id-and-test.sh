@@ -15,4 +15,4 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
 fi
 
 # Copy the ssh key to the remote host
-ssh-copy-id -i ~/.ssh/id_rsa.pub $1
+ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no $1
