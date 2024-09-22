@@ -2,6 +2,8 @@
 # Define the remote hosts variables pass them as arguments 
 # to the script
 # Example: ./copy-ssh-id-and-test.sh root@example.com
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+set -x
 if [ -z $1 ]; then
     echo "Please provide the remote host"
     echo "Example: ./copy-ssh-id-and-test.sh admin@example.com"
