@@ -10,7 +10,9 @@ python trigger-equinix-server-instance.py \
     --new_domain "new_domain" \
     --new_forwarder "new_forwarder_ip" \
     --freeipa_server_fqdn "freeipa_server_fqdn" \
-    --freeipa_server_domain "freeipa_server_domain"
+    --freeipa_server_domain "freeipa_server_domain" \
+    --guid "your_guid" \
+    --ollama "true"
 ```
 
 ### Required Arguments:
@@ -21,6 +23,8 @@ python trigger-equinix-server-instance.py \
 - `--new_forwarder`: The new forwarder IP.
 - `--freeipa_server_fqdn`: The FreeIPA server FQDN.
 - `--freeipa_server_domain`: The FreeIPA server domain.
+- `--guid`: The GUID.
+- `--ollama`: The OLLAMA value.
 
 Make sure to replace the placeholders with actual values when running the script.
 

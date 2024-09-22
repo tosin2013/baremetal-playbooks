@@ -50,6 +50,8 @@ if __name__ == "__main__":
     parser.add_argument('--new_forwarder', type=str, help='New forwarder IP', required=True)
     parser.add_argument('--freeipa_server_fqdn', type=str, help='FreeIPA server FQDN', required=True)
     parser.add_argument('--freeipa_server_domain', type=str, help='FreeIPA server domain', required=True)
+    parser.add_argument('--guid', type=str, help='GUID', required=True)
+    parser.add_argument('--ollama', type=str, help='OLLAMA', required=True)
     args = parser.parse_args()
     
     repo_owner = "tosin2013"
@@ -63,7 +65,9 @@ if __name__ == "__main__":
         "NEW_DOMAIN": args.new_domain,
         "NEW_FORWARDER": args.new_forwarder,
         "FREEIPA_SERVER_FQDN": args.freeipa_server_fqdn,
-        "FREEIPA_SERVER_DOMAIN": args.freeipa_server_domain
+        "FREEIPA_SERVER_DOMAIN": args.freeipa_server_domain,
+        "GUID": args.guid,
+        "OLLAMA": args.ollama
     }
     
     ssh_password = args.ssh_password
