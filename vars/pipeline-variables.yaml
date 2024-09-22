@@ -1,12 +1,12 @@
 ---
-rhsm_username: "{{ inputs.NEW_USERNAME }}"
-rhsm_password: "{{ inputs.NEW_PASSWORD }}"
-rhsm_org: "{{ inputs.NEW_ORG }}"
-rhsm_activationkey: "{{ inputs.NEW_ACTIVATION_KEY }}"
-admin_user_password: "{{ inputs.ADMIN_USER_PASSWORD }}"
-offline_token: "{{ inputs.OFFLINE_TOKEN }}"
-openshift_pull_secret: "{{ inputs.OPENSHIFT_PULL_SECRET }}"
-automation_hub_offline_token: "{{ inputs.AUTOMATION_HUB_OFFLINE_TOKEN }}"
-freeipa_server_admin_password: "{{ inputs.FREEIPA_SERVER_ADMIN_PASSWORD }}"
-xrdp_remote_user: "{{ inputs.XRDP_REMOTE_USER }}"
-xrdp_remote_user_password: "{{ inputs.XRDP_REMOTE_USER_PASSWORD }}"
+rhsm_username: rheluser
+rhsm_password: rhelpassword
+rhsm_org: orgid
+rhsm_activationkey: activationkey
+admin_user_password: password # Change to the lab-user password
+offline_token: offlinetoken
+openshift_pull_secret: pullsecret
+automation_hub_offline_token: automationhubtoken
+freeipa_server_admin_password: password # Change to the lab-user password
+xrdp_remote_user: remoteuser
+xrdp_remote_user_password: password
