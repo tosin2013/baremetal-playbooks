@@ -186,9 +186,7 @@ for arg in "$@"; do
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-ssh-key.yaml -e "@$SECRETS_FILE"
         ;;
         --push-pipeline-vars)
-        if [[ " ${args[*]} " == *" --debug-pipeline-vars "* ]]; then
-          debug_pipeline_vars
-        fi
+        debug_pipeline_vars
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-pipeline-variables.yaml -e "variables_file=$PIPELINES_VARS" -vvv || exit $?
         ;;
         --trigger-github-pipelines)
