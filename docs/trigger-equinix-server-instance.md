@@ -23,3 +23,6 @@ python trigger-equinix-server-instance.py \
 - `--freeipa_server_domain`: The FreeIPA server domain.
 
 Make sure to replace the placeholders with actual values when running the script.
+
+### GitHub Token Permissions
+Ensure that the GitHub token used has the `repo` scope to access repository secrets.
