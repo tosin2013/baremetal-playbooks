@@ -74,14 +74,20 @@ function validate_key_file {
 }
 
 function usage {
-    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--copy-files] [--ipa-server] [--ocp-ai-svc] [--load-from-vault]"
+    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--copy-files] [--ipa-server] [--ocp-ai-svc] [--load-from-vault] [--debug-pipeline-vars]"
     echo "End-to-End: $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
     echo "Download Image: $0 --copy-image"
     echo "Copy Files: $0 --copy-files"
     echo "FreeIPA Server: $0 --ipa-server"
     echo "OCP AI Service: $0 --ocp-ai-svc"
     echo "Load from Vault: $0 --load-from-vault"
+    echo "Debug Pipeline Vars: $0 --debug-pipeline-vars"
     exit 1
+}
+
+function debug_pipeline_vars {
+  echo "Debugging pipeline-variables.yaml:"
+  cat "$PIPELINES_VARS"
 }
 
 function copy_dir_files {
@@ -179,6 +185,9 @@ for arg in "$@"; do
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-ssh-key.yaml -e "@$SECRETS_FILE"
         ;;
         --push-pipeline-vars)
+        if [[ " ${args[*]} " == *" --debug-pipeline-vars "* ]]; then
+          debug_pipeline_vars
+        fi
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-pipeline-variables.yaml -e "variables_file=$PIPELINES_VARS" -vvv || exit $?
         ;;
         --trigger-github-pipelines)
@@ -196,6 +205,9 @@ for arg in "$@"; do
         ;;
         --ocp-ai-svc)
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/trigger-github-pipelines.yaml -e "@$OCP_AI_SVC_VARS_FILE"
+        ;;
+        --debug-pipeline-vars)
+        # This flag will be handled in the --push-pipeline-vars case
         ;;
         *)
         usage
