@@ -22,4 +22,8 @@ if [ -z "$SSH_PASSWORD" ]; then
     exit 1
 fi
 
-sshpass -p "$SSH_PASSWORD" ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no $2@$1
+if ssh -o BatchMode=yes -o ConnectTimeout=5 $2@$1 'exit 0'; then
+    echo "SSH key is already present on the remote host. Skipping ssh-copy-id."
+else
+    sshpass -p "$SSH_PASSWORD" ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no $2@$1
+fi
