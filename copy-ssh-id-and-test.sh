@@ -15,4 +15,9 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
 fi
 
 # Copy the ssh key to the remote host
-ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no $1
+if [ -z "$SSH_PASSWORD" ]; then
+    echo "SSH_PASSWORD environment variable is not set"
+    exit 1
+fi
+
+sshpass -p "$SSH_PASSWORD" ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no $1
