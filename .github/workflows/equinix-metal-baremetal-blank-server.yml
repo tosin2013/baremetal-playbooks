@@ -102,5 +102,5 @@ jobs:
         run: |
           source .env
           cat .env
-          export inputs='{"NEW_HOST": "${NEW_HOST}", "NEW_USERNAME": "${NEW_USERNAME}", "NEW_DOMAIN": "${NEW_DOMAIN}", "NEW_FORWARDER": "${NEW_FORWARDER}", "FREEIPA_SERVER_FQDN": "${FREEIPA_SERVER_FQDN}", "FREEIPA_SERVER_DOMAIN": "${FREEIPA_SERVER_DOMAIN}", "GUID": "${GUID}", "OLLAMA": "${OLLAMA}"}'
+          #export inputs='{"NEW_HOST": "${NEW_HOST}", "NEW_USERNAME": "${NEW_USERNAME}", "NEW_DOMAIN": "${NEW_DOMAIN}", "NEW_FORWARDER": "${NEW_FORWARDER}", "FREEIPA_SERVER_FQDN": "${FREEIPA_SERVER_FQDN}", "FREEIPA_SERVER_DOMAIN": "${FREEIPA_SERVER_DOMAIN}", "GUID": "${GUID}", "OLLAMA": "${OLLAMA}"}'
           bash -x ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault || exit $?
