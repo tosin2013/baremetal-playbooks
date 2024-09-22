@@ -1,17 +1,29 @@
 #!/bin/bash
-# Usage: ./bootstrap.sh [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines]
+# Usage: ./bootstrap.sh [OPTIONS]
+# Options:
+#   --push-ssh-key             Push SSH keys to the target servers.
+#   --push-pipeline-vars       Update and push pipeline variables.
+#   --trigger-github-pipelines Trigger GitHub pipelines.
+#   --copy-image               Download specific images on the target host.
+#   --copy-files               Copy necessary files to the target host.
+#   --ipa-server               Configure FreeIPA server settings.
+#   --ocp-ai-svc               Configure OCP AI Service settings.
+#   --load-from-vault          Load environment variables from HCP Vault.
+#   --debug-pipeline-vars      Debug the pipeline variables YAML file.
+#   --help                     Display usage information.
+
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -x
 
+# Function to load environment variables
 function load_env_vars {
-  # Load environment variables from .env file or HCP Vault
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
       hcp profile init --vault-secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
         if [ -z "${!var}" ]; then
-          value=$(hcp vault-secrets secrets open ${var} --format=json  --app=qubinode-env-files | jq -r .static_version.value || exit 1)
+          value=$(hcp vault-secrets secrets open ${var} --format=json --app=qubinode-env-files | jq -r .static_version.value || exit 1)
           if [ -n "$value" ]; then
             export ${var}="$value"
           fi
@@ -32,6 +44,7 @@ function load_env_vars {
   fi
 }
 
+# Function to check required environment variables
 function check_env_vars {
   for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
     if [ -z "${!var}" ]; then
@@ -41,30 +54,24 @@ function check_env_vars {
   done
 }
 
+# Function to reformat SSH private key
 function reformat_key {
   local key="$1"
   local key_file="$2"
 
-  # Remove any existing file with the same name
   rm -f "$key_file"
 
-  # Use sed to remove the headers and footers
   key_content=$(echo "$key" | sed 's/-----BEGIN OPENSSH PRIVATE KEY-----//;s/-----END OPENSSH PRIVATE KEY-----//')
 
-  # Add header to the key file
   echo "-----BEGIN OPENSSH PRIVATE KEY-----" > "$key_file"
-
-  # Split the key content into lines of 64 characters and append to the file
   echo "$key_content" | tr -d ' ' | fold -w 64 >> "$key_file"
-
-  # Add footer to the key file
   echo "-----END OPENSSH PRIVATE KEY-----" >> "$key_file"
 
   echo "Formatted key saved to $key_file:"
   cat "$key_file"
 }
 
-
+# Function to validate SSH key file
 function validate_key_file {
   local key_file="$1"
   if ! ssh-keygen -lf "$key_file" > /dev/null 2>&1; then
@@ -73,39 +80,134 @@ function validate_key_file {
   fi
 }
 
+# Function to display usage
 function usage {
-    echo "Usage: $0 [--push-ssh-key] [--push-pipeline-vars] [--trigger-github-pipelines] [--copy-image] [--copy-files] [--ipa-server] [--ocp-ai-svc] [--load-from-vault] [--debug-pipeline-vars]"
-    echo "End-to-End: $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
-    echo "Download Image: $0 --copy-image"
-    echo "Copy Files: $0 --copy-files"
-    echo "FreeIPA Server: $0 --ipa-server"
-    echo "OCP AI Service: $0 --ocp-ai-svc"
-    echo "Load from Vault: $0 --load-from-vault"
-    echo "Debug Pipeline Vars: $0 --debug-pipeline-vars"
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  --push-ssh-key             Push SSH keys to the target servers."
+    echo "  --push-pipeline-vars       Update and push pipeline variables."
+    echo "  --trigger-github-pipelines Trigger GitHub pipelines."
+    echo "  --copy-image               Download specific images on the target host."
+    echo "  --copy-files               Copy necessary files to the target host."
+    echo "  --ipa-server               Configure FreeIPA server settings."
+    echo "  --ocp-ai-svc               Configure OCP AI Service settings."
+    echo "  --load-from-vault          Load environment variables from HCP Vault."
+    echo "  --debug-pipeline-vars      Debug the pipeline variables YAML file."
+    echo "  --help                     Display usage information."
+    echo ""
+    echo "Examples:"
+    echo "  End-to-End Setup:"
+    echo "    $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines"
+    echo "  Download Images:"
+    echo "    $0 --copy-image"
+    echo "  Copy Files:"
+    echo "    $0 --copy-files"
+    echo "  Configure FreeIPA Server:"
+    echo "    $0 --ipa-server"
+    echo "  Configure OCP AI Service:"
+    echo "    $0 --ocp-ai-svc"
+    echo "  Load Environment Variables from Vault:"
+    echo "    $0 --load-from-vault"
+    echo "  Debug Pipeline Variables:"
+    echo "    $0 --debug-pipeline-vars"
     exit 1
 }
 
+# Function to debug pipeline variables
 function debug_pipeline_vars {
   echo "Debugging pipeline-variables.yaml:"
   cat "$PIPELINES_VARS"
   exit 1
 }
 
+# Function to copy files to target host
 function copy_dir_files {
-  # Define the target host and directory
   TARGET_HOST="${NEW_USERNAME}@${NEW_HOST}"
   TARGET_DIR="/tmp/baremetal-playbooks"
 
-  # Copy files using SSH
-  ssh "$TARGET_HOST" "mkdir -p $TARGET_DIR"
-  scp files/* "$TARGET_HOST:$TARGET_DIR"
+  ssh "$TARGET_HOST" "mkdir -p $TARGET_DIR" || {
+    echo "ERROR: Failed to create directory $TARGET_DIR on $TARGET_HOST"
+    exit 1
+  }
+
+  scp files/* "$TARGET_HOST:$TARGET_DIR" || {
+    echo "ERROR: Failed to copy files to $TARGET_HOST:$TARGET_DIR"
+    exit 1
+  }
+}
+
+# Function to update individual YAML variables
+function update_yaml_variable {
+  local file="$1"
+  local key="$2"
+  local value="$3"
+
+  # Escape double quotes and backslashes in the value to prevent YAML syntax issues
+  local safe_value=$(echo "$value" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+  ${YQ_COMMAND} e -i ".${key} = \"${safe_value}\"" "$file" || {
+    echo "ERROR: Failed to update ${key} in ${file}"
+    exit 1
+  }
+}
+
+# Function to update pipeline-variables.yaml
+function update_pipeline_variables_yaml {
+  echo "Updating pipeline-variables.yaml with environment variables..."
+
+  declare -A vars_to_update=(
+    ["rhsm_username"]="rhsm_username"
+    ["rhsm_password"]="rhsm_password"
+    ["rhsm_org"]="rhsm_org"
+    ["rhsm_activationkey"]="rhsm_activationkey"
+    ["admin_user_password"]="admin_user_password"
+    ["offline_token"]="offline_token"
+    ["openshift_pull_secret"]="openshift_pull_secret"
+    ["automation_hub_offline_token"]="automation_hub_offline_token"
+    ["freeipa_server_admin_password"]="freeipa_server_admin_password"
+    ["GITHUB_TOKEN"]="GITHUB_TOKEN"
+    ["KCLI_PIPELINES_GITHUB_TOKEN"]="KCLI_PIPELINES_GITHUB_TOKEN"
+    ["OCP_AI_SVC_PIPELINES_GITHUB_TOKEN"]="OCP_AI_SVC_PIPELINES_GITHUB_TOKEN"
+    ["pool_id"]="pool_id"
+    ["aws_access_key"]="aws_access_key"
+    ["aws_secret_key"]="aws_secret_key"
+    ["SSH_PUBLIC_KEY"]="SSH_PUBLIC_KEY"
+    ["SSH_PRIVATE_KEY"]="SSH_PRIVATE_KEY"
+    ["xrdp_remote_user"]="xrdp_remote_user"
+    ["xrdp_remote_user_password"]="xrdp_remote_user_password"
+  )
+
+  for yaml_key in "${!vars_to_update[@]}"; do
+    env_var="${vars_to_update[$yaml_key]}"
+    env_value="${!env_var}"
+
+    if [ -z "${env_value:-}" ]; then
+      echo "WARNING: Environment variable ${env_var} is not set. Skipping update for ${yaml_key}."
+      continue
+    fi
+
+    update_yaml_variable "$PIPELINES_VARS" "$yaml_key" "$env_value"
+  done
+
+  # Validate YAML syntax after updates
+  if ! ${YQ_COMMAND} e . "$PIPELINES_VARS" > /dev/null 2>&1; then
+    echo "ERROR: Invalid YAML syntax in $PIPELINES_VARS after updates."
+    exit 1
+  fi
+
+  echo "pipeline-variables.yaml updated successfully."
+
+  # Secure the YAML file
+  chmod 600 "$PIPELINES_VARS" || {
+    echo "ERROR: Failed to set permissions on $PIPELINES_VARS"
+    exit 1
+  }
 }
 
 # If no arguments are provided, display usage
 if [ $# -eq 0 ]; then
     usage
 fi
-
 
 # Define the path to the secrets file
 SECRETS_FILE="vars/secrets.yml"
@@ -126,9 +228,10 @@ else
   exit 1
 fi
 
-# Load environment variables
+# Load environment variables and update pipeline-variables.yaml if using Vault
 if [ "$USE_VAULT" == "true" ]; then
   load_env_vars --load-from-vault
+  update_pipeline_variables_yaml
 else
   load_env_vars
 fi
@@ -139,8 +242,8 @@ check_env_vars
 # Define the path to the original hosts file
 ORIGINAL_HOSTS_FILE="hosts"
 
-# Use sed to update line two of the [github_servers] group in the hosts file
-echo $NEW_USERNAME || exit $?
+# Update the hosts file
+echo "$NEW_USERNAME" || exit $?
 sed -i "/^\[github_servers\]/!b;n;c$NEW_HOST ansible_user=$NEW_USERNAME" "$ORIGINAL_HOSTS_FILE"
 
 # Reformat and validate the private key
@@ -148,13 +251,12 @@ SSH_PRIVATE_KEY_FILE="formatted_private_key.pem"
 reformat_key "$SSH_PRIVATE_KEY" "$SSH_PRIVATE_KEY_FILE"
 validate_key_file "$SSH_PRIVATE_KEY_FILE"
 
+# Use yq to update secrets.yml
+echo "$SSH_PUBLIC_KEY" || exit 1
+${YQ_COMMAND} e -i ".ssh_public_key = \"$(echo "$SSH_PUBLIC_KEY")\"" "$SECRETS_FILE"
+${YQ_COMMAND} e -i ".ssh_private_key = \"$(cat "$SSH_PRIVATE_KEY_FILE")\"" "$SECRETS_FILE"
 
-# Use yq to update ssh_public_key and ssh_private_key values in secrets.yml
-echo $SSH_PUBLIC_KEY || exit 1
-${YQ_COMMAND} e -i ".ssh_public_key = \"$(echo $SSH_PUBLIC_KEY)\"" "$SECRETS_FILE"
-${YQ_COMMAND} e -i ".ssh_private_key = \"$(cat $SSH_PRIVATE_KEY_FILE)\"" "$SECRETS_FILE"
-
-# Use yq to update github_token, ssh_password, and json_body variables in github-actions-vars.yml
+# Use yq to update github-actions-vars.yml
 ${YQ_COMMAND} e -i ".github_token = \"$GITHUB_TOKEN\"" "$GITHUB_ACTIONS_VARS_FILE"
 ${YQ_COMMAND} e -i ".ssh_password = \"$SSH_PASSWORD\"" "$GITHUB_ACTIONS_VARS_FILE"
 ${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$GITHUB_ACTIONS_VARS_FILE"
@@ -163,23 +265,22 @@ ${YQ_COMMAND} e -i ".json_body.inputs.zone_name = \"$NEW_DOMAIN\"" "$GITHUB_ACTI
 ${YQ_COMMAND} e -i ".json_body.inputs.guid = \"$GUID\"" "$GITHUB_ACTIONS_VARS_FILE"
 ${YQ_COMMAND} e -i ".json_body.inputs.forwarder = \"$NEW_FORWARDER\"" "$GITHUB_ACTIONS_VARS_FILE"
 ${YQ_COMMAND} e -i ".json_body.inputs.ollama = \"$OLLAMA\"" "$GITHUB_ACTIONS_VARS_FILE"
-cat $GITHUB_ACTIONS_VARS_FILE
+cat "$GITHUB_ACTIONS_VARS_FILE"
 
-# Use yq to update github_token in freeipa-vars.yml
+# Use yq to update freeipa-vars.yml
 ${YQ_COMMAND} e -i ".github_token = \"$KCLI_PIPELINES_GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_fqdn = \"$FREEIPA_SERVER_FQDN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_domain = \"$FREEIPA_SERVER_DOMAIN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_admin_password = \"$FREEIPA_SERVER_ADMIN_PASSWORD\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$FREEIPA_VARS_FILE"
+cat "$FREEIPA_VARS_FILE"
 
-cat $FREEIPA_VARS_FILE
-
-# Use yq to update github_token in ocp-ai-svc-vars.yml
+# Use yq to update ocp-ai-svc-vars.yml
 ${YQ_COMMAND} e -i ".github_token = \"$OCP_AI_SVC_PIPELINES_GITHUB_TOKEN\"" "$OCP_AI_SVC_VARS_FILE"
 ${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$OCP_AI_SVC_VARS_FILE"
+cat "$OCP_AI_SVC_VARS_FILE"
 
-cat $OCP_AI_SVC_VARS_FILE
-
+# Argument Parsing and Execution
 for arg in "$@"; do
     case $arg in
         --push-ssh-key)
