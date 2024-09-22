@@ -70,3 +70,4 @@ if __name__ == "__main__":
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     
     trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
+    print("Pipeline has been triggered successfully.")
