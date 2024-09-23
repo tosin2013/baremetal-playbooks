@@ -62,7 +62,13 @@ function load_env_vars {
       hcp profile set organization_id "$HCP_ORG_ID"
       hcp profile set project_id "$HCP_PROJECT_ID"
       hcp profile set vault-secrets/app "$APP_NAME"
-      hcp profile init --vault-secrets|| {
+
+      if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to initialize HCP profile."
+        exit 1
+      fi
+      
+      hcp profile init --vault-secrets || {
           echo "ERROR: Failed to initialize HCP profile."
           exit 1
         }
