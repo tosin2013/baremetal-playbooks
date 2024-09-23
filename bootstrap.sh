@@ -49,7 +49,6 @@ function usage {
 }
 
 # Function to load environment variables
-# Function to load environment variables
 function load_env_vars {
   # Load environment variables from HCP Vault
   if [ "$1" == "--load-from-vault" ]; then
@@ -86,23 +85,24 @@ function load_env_vars {
 
       # Loop to fetch and set secrets from HCP Vault Secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
-        if [ -z "${!var}" ]; then
-          secret_value=$(curl -s \
-            --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/secrets/$var" \
-            --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
+        # Fetch secret value from HCP Vault
+        secret_value=$(curl -s \
+          --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/secrets/$var" \
+          --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
 
-          if [ -n "$secret_value" ]; then
-            export ${var}="$secret_value"
-            echo "Loaded $var from HCP Vault."
-          else
-            echo "WARNING: Secret $var not found in HCP Vault."
-          fi
+        # Check if secret was fetched and append to .env file
+        if [ -n "$secret_value" ]; then
+          echo "Exporting $var from HCP Vault."
+          echo "$var=$secret_value" >> .env
+          export $var="$secret_value"  # Also export to current shell
+        else
+          echo "WARNING: Secret $var not found in HCP Vault."
         fi
       done
 
-      # Load additional configurations if necessary
-      configure_ansible_vault
+      # Load .env file into the current shell
       source .env
+      configure_ansible_vault
     else
       echo "ERROR: HCP CLI is not installed."
       exit 1
@@ -110,15 +110,14 @@ function load_env_vars {
   else
     # Load from local .env file
     if [ -f .env ]; then
-      configure_ansible_vault
       source .env
+      configure_ansible_vault
     else
       echo "ERROR: .env file not found."
       exit 1
     fi
   fi
 }
-
 
 
 configure_ansible_vault() {
