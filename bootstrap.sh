@@ -54,25 +54,25 @@ function load_env_vars {
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
-      if [ -z $HCP_CLIENT_SECRET ] || [ -z $HCP_ORG_ID ] || [ -z $HCP_PROJECT_ID ];
-      then
-        echo "ERROR: HCP_CLIENT_SECRET environment variable is not set."
-        echo "ERROR: HCP_ORG_ID environment variable is not set."
-        echo "ERROR: HCP_PROJECT_ID environment variable is not set."
+      if [ -z "$HCP_CLIENT_SECRET" ] || [ -z "$HCP_ORG_ID" ] || [ -z "$HCP_PROJECT_ID" ]; then
+        echo "ERROR: Required HCP environment variables are not set."
         exit 1
       fi
 
-      hcp profile set organization_id ${HCP_ORG_ID}
-      hcp profile set project_id ${HCP_PROJECT_ID}
-      hcp profile init --vault-secrets
+      # Set organization and project non-interactively
+      hcp profile set organization_id "$HCP_ORG_ID"
+      hcp profile set project_id "$HCP_PROJECT_ID"
+
+      # Loop to fetch and set secrets from HCP Vault Secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
         if [ -z "${!var}" ]; then
-          value=$(hcp vault-secrets secrets open ${var} --format=json  --app=qubinode-env-files | jq -r .static_version.value || exit 1)
+          value=$(hcp vault-secrets secrets open ${var} --format=json --app=qubinode-env-files | jq -r .static_version.value || exit 1)
           if [ -n "$value" ]; then
             export ${var}="$value"
           fi
         fi
       done
+
       configure_ansible_vault
       source .env
     else
