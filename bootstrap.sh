@@ -65,7 +65,7 @@ function load_env_vars {
 
       # Loop to fetch and set secrets from HCP Vault Secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
-        if [ -z "${!var}" ]; then
+        if [ ! -z "${var}" ]; then
           value=$(hcp vault-secrets secrets open ${var} --format=json --app=qubinode-env-files | jq -r .static_version.value || exit 1)
           if [ -n "$value" ]; then
             export ${var}="$value"
