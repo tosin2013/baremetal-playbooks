@@ -49,37 +49,66 @@ function usage {
 }
 
 # Function to load environment variables
+# Function to load environment variables
 function load_env_vars {
-  # Load environment variables from .env file or HCP Vault
+  # Load environment variables from HCP Vault
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
-      if [ -z "$HCP_CLIENT_SECRET" ] || [ -z "$HCP_ORG_ID" ] || [ -z "$HCP_PROJECT_ID" ]; then
-        echo "ERROR: Required HCP environment variables are not set."
+
+      # Check if required environment variables are set
+      if [ -z "$HCP_CLIENT_ID" ] || [ -z "$HCP_CLIENT_SECRET" ]; then
+        echo "ERROR: HCP_CLIENT_ID or HCP_CLIENT_SECRET is not set."
         exit 1
       fi
 
-      # Set organization and project non-interactively
-      hcp profile set organization_id "$HCP_ORG_ID"
-      hcp profile set project_id "$HCP_PROJECT_ID"
+      # Retrieve organization_id and project_id
+      export HCP_ORG_ID=$(hcp profile display --format=json | jq -r .organization_id)
+      export HCP_PROJECT_ID=$(hcp profile display --format=json | jq -r .project_id)
+      export APP_NAME=$(hcp profile display --format=json | jq -r .vault_secrets.app)
+
+      if [ -z "$HCP_ORG_ID" ] || [ -z "$HCP_PROJECT_ID" ] || [ -z "$APP_NAME" ]; then
+        echo "ERROR: Could not retrieve organization_id, project_id, or app name."
+        exit 1
+      fi
+
+      # Retrieve API token
+      HCP_API_TOKEN=$(curl -s https://auth.idp.hashicorp.com/oauth/token \
+        --data grant_type=client_credentials \
+        --data client_id="$HCP_CLIENT_ID" \
+        --data client_secret="$HCP_CLIENT_SECRET" \
+        --data audience="https://api.hashicorp.cloud" | jq -r .access_token)
+
+      if [ -z "$HCP_API_TOKEN" ]; then
+        echo "ERROR: Failed to retrieve API token."
+        exit 1
+      fi
 
       # Loop to fetch and set secrets from HCP Vault Secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
-        if [ ! -z "${!var}" ]; then  # Indirect expansion to check if the variable is set
-          value=$(hcp vault-secrets secrets open ${var} --format=json --app=qubinode-env-files | jq -r .static_version.value || exit 1)
-          if [ -n "$value" ]; then
-            export ${var}="$value"
+        if [ -z "${!var}" ]; then
+          secret_value=$(curl -s \
+            --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/secrets/$var" \
+            --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
+
+          if [ -n "$secret_value" ]; then
+            export ${var}="$secret_value"
+            echo "Loaded $var from HCP Vault."
+          else
+            echo "WARNING: Secret $var not found in HCP Vault."
           fi
         fi
       done
 
+      # Load additional configurations if necessary
       configure_ansible_vault
       source .env
     else
-      echo "ERROR: HCP Vault CLI is not installed."
+      echo "ERROR: HCP CLI is not installed."
       exit 1
     fi
   else
+    # Load from local .env file
     if [ -f .env ]; then
       configure_ansible_vault
       source .env
@@ -89,6 +118,7 @@ function load_env_vars {
     fi
   fi
 }
+
 
 
 configure_ansible_vault() {
