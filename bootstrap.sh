@@ -175,6 +175,8 @@ function check_env_vars {
     OCP_AI_SVC_PIPELINES_GITHUB_TOKEN
     GUID
     OLLAMA
+    AWS_ACCESS_KEY
+    AWS_SECRET_KEY
   )
 
   for var in "${required_vars[@]}"; do
@@ -239,62 +241,6 @@ function update_yaml_variable {
   echo "Updated ${key} in ${file}."
 }
 
-# Function to update pipeline-variables.yaml
-function update_pipeline_variables_yaml {
-  echo "Starting update_pipeline_variables_yaml function..."
-
-  declare -A vars_to_update=(
-    ["rhsm_username"]="rhsm_username"
-    ["rhsm_password"]="rhsm_password"
-    ["rhsm_org"]="rhsm_org"
-    ["rhsm_activationkey"]="rhsm_activationkey"
-    ["admin_user_password"]="admin_user_password"
-    ["offline_token"]="offline_token"
-    ["openshift_pull_secret"]="openshift_pull_secret"
-    ["automation_hub_offline_token"]="automation_hub_offline_token"
-    ["freeipa_server_admin_password"]="freeipa_server_admin_password"
-    ["GITHUB_TOKEN"]="GITHUB_TOKEN"
-    ["KCLI_PIPELINES_GITHUB_TOKEN"]="KCLI_PIPELINES_GITHUB_TOKEN"
-    ["OCP_AI_SVC_PIPELINES_GITHUB_TOKEN"]="OCP_AI_SVC_PIPELINES_GITHUB_TOKEN"
-    ["pool_id"]="pool_id"
-    ["aws_access_key"]="aws_access_key"
-    ["aws_secret_key"]="aws_secret_key"
-    ["SSH_PUBLIC_KEY"]="SSH_PUBLIC_KEY"
-    ["SSH_PRIVATE_KEY"]="SSH_PRIVATE_KEY"
-    ["xrdp_remote_user"]="xrdp_remote_user"
-    ["xrdp_remote_user_password"]="xrdp_remote_user_password"
-  )
-
-  for yaml_key in "${!vars_to_update[@]}"; do
-    env_var="${vars_to_update[$yaml_key]}"
-    env_value="${!env_var}"
-
-    if [ -z "${env_value:-}" ]; then
-      echo "WARNING: Environment variable ${env_var} is not set. Skipping update for ${yaml_key}."
-      continue
-    fi
-
-    echo "Updating ${yaml_key} with value from ${env_var}"
-    update_yaml_variable "$PIPELINES_VARS" "$yaml_key" "$env_value"
-  done
-
-  # Validate YAML syntax after updates
-  echo "Validating YAML syntax for $PIPELINES_VARS..."
-  if ! ${YQ_COMMAND} e . "$PIPELINES_VARS" > /dev/null 2>&1; then
-    echo "ERROR: Invalid YAML syntax in $PIPELINES_VARS after updates."
-    exit 1
-  fi
-
-  echo "pipeline-variables.yaml updated successfully."
-
-  # Secure the YAML file
-  chmod 600 "$PIPELINES_VARS" || {
-    echo "ERROR: Failed to set permissions on $PIPELINES_VARS"
-    exit 1
-  }
-
-  echo "Finished update_pipeline_variables_yaml function."
-}
 
 # Function to debug pipeline variables
 function debug_pipeline_vars {
@@ -365,34 +311,7 @@ else
   exit 1
 fi
 
-# Load environment variables and update pipeline-variables.yaml if using Vault
-USE_VAULT="${USE_VAULT:-false}"
-if [ "$USE_VAULT" == "true" ]; then
-  load_env_vars --load-from-vault
-  echo "Environment Variables Loaded from Vault:"
-  echo "rhsm_username=${rhsm_username}"
-  echo "rhsm_password=${rhsm_password}"
-  echo "rhsm_org=${rhsm_org}"
-  echo "rhsm_activationkey=${rhsm_activationkey}"
-  echo "admin_user_password=${admin_user_password}"
-  echo "offline_token=${offline_token}"
-  echo "openshift_pull_secret=${openshift_pull_secret}"
-  echo "automation_hub_offline_token=${automation_hub_offline_token}"
-  echo "freeipa_server_admin_password=${freeipa_server_admin_password}"
-  echo "GITHUB_TOKEN=${GITHUB_TOKEN}"
-  echo "KCLI_PIPELINES_GITHUB_TOKEN=${KCLI_PIPELINES_GITHUB_TOKEN}"
-  echo "OCP_AI_SVC_PIPELINES_GITHUB_TOKEN=${OCP_AI_SVC_PIPELINES_GITHUB_TOKEN}"
-  echo "pool_id=${pool_id}"
-  echo "aws_access_key=${aws_access_key}"
-  echo "aws_secret_key=${aws_secret_key}"
-  echo "SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY}"
-  echo "SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}"
-  echo "xrdp_remote_user=${xrdp_remote_user}"
-  echo "xrdp_remote_user_password=${xrdp_remote_user_password}"
-  update_pipeline_variables_yaml
-else
-  load_env_vars
-fi
+load_env_vars
 
 # Check if environment variables are loaded
 check_env_vars
