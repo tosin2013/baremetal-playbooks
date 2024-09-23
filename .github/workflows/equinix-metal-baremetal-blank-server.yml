@@ -89,7 +89,7 @@ jobs:
       - name: Copy SSH Key to Target Host
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-        run: ./copy-ssh-id-and-test.sh "${{ inputs.NEW_HOST }}" "${{ inputs.NEW_USERNAME }}"
+        run: ./copy-ssh-id-and-test.sh "${{ inputs.NEW_USERNAME }}" "${{ inputs.NEW_HOST }}" 
 
       - name: Run bootstrap.sh Script
         env:
