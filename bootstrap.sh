@@ -332,7 +332,6 @@ echo "Hosts file updated successfully."
 
 # Reformat and validate the private key
 SSH_PRIVATE_KEY_FILE="formatted_private_key.pem"
-cat "$SSH_PRIVATE_KEY_FILE"
 cat "$SSH_PRIVATE_KEY"
 reformat_key "$SSH_PRIVATE_KEY" "$SSH_PRIVATE_KEY_FILE"
 validate_key_file "$SSH_PRIVATE_KEY_FILE"
