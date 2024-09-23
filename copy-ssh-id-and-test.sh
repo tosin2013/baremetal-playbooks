@@ -1,19 +1,15 @@
 #!/bin/bash
 
-# Enhanced Script to Copy RSA SSH Key to Remote Host if Not Present
-# Usage: ./copy-ssh-id-and-test.sh username host
+# manage-ssh-key.sh
+# Usage: ./manage-ssh-key.sh username host
 
 set -euo pipefail
 IFS=$'\n\t'
 
-# Enable debugging if needed
-# export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-# set -x
-
 # Function to display usage
 usage() {
     echo "Usage: $0 username host"
-    echo "Example: $0 admin 192.168.10.100"
+    echo "Example: $0 admin 192.168.100.10"
     exit 1
 }
 
@@ -24,6 +20,12 @@ fi
 
 USERNAME="$1"
 HOST="$2"
+
+# Ensure SSH_PASSWORD is set
+if [ -z "${SSH_PASSWORD:-}" ]; then
+    echo "Error: SSH_PASSWORD environment variable is not set."
+    exit 1
+fi
 
 # Path to SSH keys
 SSH_DIR="$HOME/.ssh"
@@ -41,39 +43,42 @@ else
     echo "SSH public key already exists."
 fi
 
-# Function to check if the public key is already in authorized_keys on remote host
-key_exists_on_remote() {
-    ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" \
-    "grep -F \"$(cat ${PUBLIC_KEY})\" ~/.ssh/authorized_keys" &>/dev/null
+# Extract key type and key data from the public key
+KEY_TYPE=$(awk '{print $1}' "$PUBLIC_KEY")
+KEY_DATA=$(awk '{print $2}' "$PUBLIC_KEY")
+
+# Function to remove existing instances of the SSH key on the remote host
+remove_existing_key() {
+    echo "Removing existing instances of the SSH key from the remote host..."
+
+    # Command to remove the specific SSH key based on key type and key data
+    REMOVE_KEY_CMD="grep -v '^${KEY_TYPE} ${KEY_DATA}' ~/.ssh/authorized_keys > ~/.ssh/authorized_keys.tmp && mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys"
+
+    # Execute the command on the remote host using sshpass
+    sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "$REMOVE_KEY_CMD"
+
+    echo "Existing SSH key removed from remote host (if it existed)."
 }
 
-# Function to copy SSH key using ssh-copy-id
+# Function to copy SSH key using sshpass and ssh-copy-id
 copy_ssh_key() {
-    if command -v sshpass >/dev/null 2>&1; then
-        if [ -z "${SSH_PASSWORD:-}" ]; then
-            echo "SSH_PASSWORD environment variable is not set. Unable to use sshpass."
-            exit 1
-        fi
-        sshpass -p "$SSH_PASSWORD" ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
+    echo "Copying SSH key to remote host..."
+    sshpass -p "$SSH_PASSWORD" ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
+    echo "SSH key successfully copied."
+}
+
+# Function to test SSH connection
+test_ssh_connection() {
+    echo "Testing SSH connection..."
+    if ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" 'echo "SSH connection successful."'; then
+        echo "SSH connection to ${HOST} as ${USERNAME} is successful."
     else
-        echo "sshpass not found. Attempting to use ssh-copy-id without password."
-        ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
+        echo "SSH connection to ${HOST} as ${USERNAME} failed."
+        exit 1
     fi
 }
 
 # Main Logic
-if key_exists_on_remote; then
-    echo "SSH key is already present on the remote host. Skipping ssh-copy-id."
-else
-    echo "SSH key not found on remote host. Copying SSH key..."
-    copy_ssh_key
-    echo "SSH key successfully copied."
-fi
-
-# Optional: Test SSH connection
-if ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" 'echo "SSH connection successful."' ; then
-    echo "SSH connection to ${HOST} as ${USERNAME} is successful."
-else
-    echo "SSH connection to ${HOST} as ${USERNAME} failed."
-    exit 1
-fi
+remove_existing_key
+copy_ssh_key
+test_ssh_connection
