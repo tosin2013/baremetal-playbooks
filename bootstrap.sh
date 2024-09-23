@@ -66,16 +66,6 @@ function load_env_vars {
         exit 1
       fi
 
-      # Retrieve organization_id and project_id
-      export HCP_ORG_ID=$(hcp profile display --format=json | jq -r .organization_id)
-      export HCP_PROJECT_ID=$(hcp profile display --format=json | jq -r .project_id)
-      export APP_NAME=$(hcp profile display --format=json | jq -r .vault_secrets.app)
-
-      if [ -z "$HCP_ORG_ID" ] || [ -z "$HCP_PROJECT_ID" ] || [ -z "$APP_NAME" ]; then
-        echo "ERROR: Could not retrieve organization_id, project_id, or app name."
-        exit 1
-      fi
-
       # Retrieve API token
       HCP_API_TOKEN=$(curl -s --fail https://auth.idp.hashicorp.com/oauth/token \
         --data grant_type=client_credentials \
