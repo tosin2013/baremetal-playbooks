@@ -13,7 +13,7 @@ IFS=$'\n\t'
 # Function to display usage
 usage() {
     echo "Usage: $0 username host"
-    echo "Example: $0 admin example.com"
+    echo "Example: $0 admin 192.168.10.100"
     exit 1
 }
 
@@ -33,12 +33,18 @@ PUBLIC_KEY="$SSH_DIR/id_rsa.pub"
 # Generate SSH key pair if not exists
 if [ ! -f "$PUBLIC_KEY" ]; then
     echo "SSH public key not found. Generating a new RSA SSH key pair..."
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
     ssh-keygen -t rsa -b 4096 -N "" -f "$PRIVATE_KEY"
+    echo "SSH key pair generated."
+else
+    echo "SSH public key already exists."
 fi
 
 # Function to check if the public key is already in authorized_keys on remote host
 key_exists_on_remote() {
-    ssh -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" "grep -F \"$(cat ${PUBLIC_KEY})\" ~/.ssh/authorized_keys" &>/dev/null
+    ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" \
+    "grep -F \"$(cat ${PUBLIC_KEY})\" ~/.ssh/authorized_keys" &>/dev/null
 }
 
 # Function to copy SSH key using ssh-copy-id
@@ -50,7 +56,7 @@ copy_ssh_key() {
         fi
         sshpass -p "$SSH_PASSWORD" ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
     else
-        # If sshpass is not available, prompt the user to enter the password
+        echo "sshpass not found. Attempting to use ssh-copy-id without password."
         ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
     fi
 }
@@ -65,7 +71,7 @@ else
 fi
 
 # Optional: Test SSH connection
-if ssh -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" 'echo "SSH connection successful."' ; then
+if ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" 'echo "SSH connection successful."' ; then
     echo "SSH connection to ${HOST} as ${USERNAME} is successful."
 else
     echo "SSH connection to ${HOST} as ${USERNAME} failed."
