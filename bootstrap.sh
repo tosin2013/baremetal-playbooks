@@ -86,7 +86,8 @@ function load_env_vars {
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
         # Fetch secret value from HCP Vault
         secret_value=$(curl -s --fail \
-          --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/secrets/$var" \
+          --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
+          --request GET \
           --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
         if [ -z "$secret_value" ]; then
           echo "WARNING: Secret $var not found in HCP Vault."
