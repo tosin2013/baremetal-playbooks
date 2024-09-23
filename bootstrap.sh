@@ -152,6 +152,8 @@ configure_ansible_vault() {
     export HCP_ORG_ID=$(hcp profile display --format=json | jq -r .OrganizationID)
     export HCP_PROJECT_ID=$(hcp profile display --format=json | jq -r .ProjectID)
     export APP_NAME="${APP_NAME}"
+    ls -lath vars/pipeline-variables.yaml
+    pwd
     if /usr/local/bin/ansiblesafe -o 5  --file="vars/pipeline-variables.yaml"; then
         echo "$SSH_PASSWORD" > ~/.vault_password
         rm -f ~/.vault_password

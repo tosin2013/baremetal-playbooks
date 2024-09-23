@@ -84,6 +84,8 @@ jobs:
           echo 'export OLLAMA="${{ inputs.OLLAMA }}"' >> .env
           echo 'export HCP_CLIENT_ID="${{ secrets.HCP_CLIENT_ID }}"' >> .env
           echo 'export HCP_CLIENT_SECRET="${{ secrets.HCP_CLIENT_SECRET }}"' >> .env
+          echo 'export HCP_PROJECT_ID="${{ secrets.HCP_PROJECT_ID }}"' >> .env
+          echo 'export APP_NAME="${{ secrets.APP_NAME }}"' >> .env
 
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
