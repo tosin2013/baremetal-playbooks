@@ -82,6 +82,8 @@ jobs:
           echo 'export USE_VAULT=true' >> .env
           echo 'export GUID="${{ inputs.GUID }}"' >> .env
           echo 'export OLLAMA="${{ inputs.OLLAMA }}"' >> .env
+          echo 'export HCP_CLIENT_ID="${{ secrets.HCP_CLIENT_ID }}"' >> .env
+          echo 'export HCP_CLIENT_SECRET="${{ secrets.HCP_CLIENT_SECRET }}"' >> .env
 
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh
