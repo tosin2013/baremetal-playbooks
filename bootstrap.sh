@@ -50,60 +50,28 @@ function usage {
 
 # Function to load environment variables
 function load_env_vars {
+  # Load environment variables from .env file or HCP Vault
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
-      
-      # Initialize HCP profile non-interactively
-      hcp auth login --client-id="$HCP_CLIENT_ID" --client-secret="$HCP_CLIENT_SECRET"  || {
-        echo "ERROR: Failed to authenticate with HCP."
-        exit 1
-      }
-      hcp profile set organization_id "$HCP_ORG_ID"
-      hcp profile set project_id "$HCP_PROJECT_ID"
-      hcp profile set vault-secrets/app "$APP_NAME"
-
-      if [ $? -ne 0 ]; then
-        echo "ERROR: Failed to initialize HCP profile."
-        exit 1
-      fi
-      
-      hcp profile init --vault-secrets || {
-          echo "ERROR: Failed to initialize HCP profile."
-          exit 1
-        }
-
-      # Fetch secrets from Vault
-      for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN GUID OLLAMA; do
-        if [ -z "${!var:-}" ]; then
-          value=$(hcp vault-secrets secrets open "${var}" --format=json --app=qubinode-env-files | jq -r .static_version.value) || {
-            echo "ERROR: Failed to retrieve ${var} from Vault."
-            exit 1
-          }
+      hcp profile init --vault-secrets
+      for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
+        if [ -z "${!var}" ]; then
+          value=$(hcp vault-secrets secrets open ${var} --format=json  --app=qubinode-env-files | jq -r .static_version.value || exit 1)
           if [ -n "$value" ]; then
-            export "${var}"="$value"
-            echo "Loaded ${var} from Vault."
-          else
-            echo "WARNING: Retrieved value for ${var} is empty."
+            export ${var}="$value"
           fi
-        else
-          echo "Environment variable ${var} is already set. Skipping Vault retrieval."
         fi
       done
       configure_ansible_vault
-      if [ -f .env ]; then
-        echo "Sourcing .env file..."
-        source .env
-      else
-        echo "WARNING: .env file not found. Continuing without sourcing."
-      fi
+      source .env
     else
       echo "ERROR: HCP Vault CLI is not installed."
       exit 1
     fi
   else
     if [ -f .env ]; then
-      echo "Sourcing .env file..."
+      configure_ansible_vault
       source .env
     else
       echo "ERROR: .env file not found."
