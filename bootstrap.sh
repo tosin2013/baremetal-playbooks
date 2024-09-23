@@ -161,6 +161,7 @@ configure_ansible_vault() {
         log_message "Failed to configure Ansible Vault"
         exit 1
     fi
+    cat vars/pipeline-variables.yaml
 }
 
 
