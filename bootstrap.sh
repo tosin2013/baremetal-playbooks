@@ -59,7 +59,7 @@ function load_env_vars {
         echo "ERROR: Failed to authenticate with HCP."
         exit 1
       }
-      hcp profile init --vault-secrets || {
+      hcp profile set --organization-id="$HCP_ORG_ID" --project-id="$HCP_PROJECT_ID" --vault-secrets || {
           echo "ERROR: Failed to initialize HCP profile."
           exit 1
         }
