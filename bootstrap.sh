@@ -55,9 +55,11 @@ function load_env_vars {
       echo "Loading environment variables from HCP Vault..."
       
       # Initialize HCP profile non-interactively
-      hcp profile init --vault-secrets \
-        --client-id="$HCP_CLIENT_ID" \
-        --client-secret="$HCP_CLIENT_SECRET"  || {
+      hcp auth login --client-id="$HCP_CLIENT_ID" --client-secret="$HCP_CLIENT_SECRET"  || {
+        echo "ERROR: Failed to authenticate with HCP."
+        exit 1
+      }
+      hcp profile init --vault-secrets || {
           echo "ERROR: Failed to initialize HCP profile."
           exit 1
         }
