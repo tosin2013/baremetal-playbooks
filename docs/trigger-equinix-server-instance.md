@@ -5,6 +5,8 @@ To trigger an Equinix Metal server instance and update the SSH password, you can
 ```bash
 python trigger-equinix-server-instance.py \
     --ssh_password "your_ssh_password" \
+    --aws_access_key "your_aws_access_key" \
+    --aws_secret_key "your_aws_secret_key" \
     --new_host "new_host_name" \
     --new_username "new_username" \
     --new_domain "new_domain" \
@@ -17,6 +19,8 @@ python trigger-equinix-server-instance.py \
 
 ### Required Arguments:
 - `--ssh_password`: The SSH password to use.
+- `--aws_access_key`: The AWS Access Key.
+- `--aws_secret_key`: The AWS Secret Key.
 - `--new_host`: The new host name.
 - `--new_username`: The new username.
 - `--new_domain`: The new domain.

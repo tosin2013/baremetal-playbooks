@@ -44,6 +44,8 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
     parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=True)
+    parser.add_argument('--aws_access_key', type=str, help='AWS Access Key', required=True)
+    parser.add_argument('--aws_secret_key', type=str, help='AWS Secret Key', required=True)
     parser.add_argument('--new_host', type=str, help='New host name', required=True)
     parser.add_argument('--new_username', type=str, help='New username', required=True)
     parser.add_argument('--new_domain', type=str, help='New domain', required=True)
@@ -71,7 +73,12 @@ if __name__ == "__main__":
     }
     
     ssh_password = args.ssh_password
+    aws_access_key = args.aws_access_key
+    aws_secret_key = args.aws_secret_key
+    
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
+    update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
+    update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
     
     trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
     print("Pipeline has been triggered successfully.")
