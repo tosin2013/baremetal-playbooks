@@ -89,6 +89,11 @@ function load_env_vars {
           --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
           --request GET \
           --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
+          curl -s --fail \
+          --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
+          --request GET \
+          --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value'
+          exit 1
         if [ -z "$secret_value" ]; then
           echo "WARNING: Secret $var not found in HCP Vault."
         fi
