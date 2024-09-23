@@ -81,6 +81,11 @@ function load_env_vars {
         echo "ERROR: Failed to retrieve API token."
         exit 1
       fi
+      curl -s --fail \
+        --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
+        --request GET \
+        --header "Authorization: Bearer $HCP_API_TOKEN" 
+        exit 1
 
       # Loop to fetch and set secrets from HCP Vault Secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
@@ -89,11 +94,6 @@ function load_env_vars {
           --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
           --request GET \
           --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value')
-          curl -s --fail \
-          --location "https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/$HCP_ORG_ID/projects/$HCP_PROJECT_ID/apps/$APP_NAME/open" \
-          --request GET \
-          --header "Authorization: Bearer $HCP_API_TOKEN" | jq -r '.secrets[0].version.value'
-          exit 1
         if [ -z "$secret_value" ]; then
           echo "WARNING: Secret $var not found in HCP Vault."
         fi
