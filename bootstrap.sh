@@ -15,6 +15,11 @@
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -euo pipefail
 
+# Function to log messages
+log_message() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
 # Function to display usage information
 function usage {
     echo "Usage: $0 [OPTIONS]"
