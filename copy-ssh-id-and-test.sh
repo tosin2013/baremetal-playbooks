@@ -9,7 +9,7 @@ IFS=$'\n\t'
 # Function to display usage
 usage() {
     echo "Usage: $0 username host"
-    echo "Example: $0 admin 192.168.100.10"
+    echo "Example: $0 lab-user 192.168.100.10"
     exit 1
 }
 
@@ -42,7 +42,7 @@ if [ ! -f "$PUBLIC_KEY" ]; then
     log "SSH public key not found. Generating a new RSA SSH key pair..."
     mkdir -p "$SSH_DIR"
     chmod 700 "$SSH_DIR"
-    ssh-keygen -t rsa -b 4096 -N "" -f "$PRIVATE_KEY"
+    ssh-keygen -t rsa -b 4096 -N "" -f "$PRIVATE_KEY" >/dev/null 2>&1
     log "SSH key pair generated."
 else
     log "SSH public key already exists."
@@ -63,24 +63,35 @@ remove_existing_key() {
     sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 
     log "Backing up existing authorized_keys on remote host..."
-    sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak"
+    sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "cp ~/.ssh/authorized_keys ~/.ssh/authorized_keys.bak || true"
 
-    log "Removing existing instances of the SSH key from remote host..."
+    log "Checking if the SSH key exists on remote host..."
+    KEY_EXISTS=$(sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "grep '^${KEY_TYPE} ${KEY_DATA}' ~/.ssh/authorized_keys" || true)
 
-    # Command to remove the specific SSH key based on key type and key data
-    REMOVE_KEY_CMD="grep -v '^${KEY_TYPE} ${KEY_DATA}' ~/.ssh/authorized_keys > ~/.ssh/authorized_keys.tmp && mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys"
-
-    # Execute the command on the remote host using sshpass
-    sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "$REMOVE_KEY_CMD"
-
-    log "Existing SSH key removed from remote host (if it existed)."
+    if [ -n "$KEY_EXISTS" ]; then
+        log "SSH key exists on remote host. Removing it..."
+        # Use sed to delete the specific SSH key based on key type and key data
+        REMOVE_KEY_CMD="sed -i '/^${KEY_TYPE} ${KEY_DATA}/d' ~/.ssh/authorized_keys"
+        if sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "${USERNAME}@${HOST}" "$REMOVE_KEY_CMD"; then
+            log "Existing SSH key removed from remote host."
+        else
+            log "Error: Failed to remove existing SSH key from remote host."
+            exit 1
+        fi
+    else
+        log "SSH key does not exist on remote host. No removal needed."
+    fi
 }
 
 # Function to copy SSH key using sshpass and ssh-copy-id
 copy_ssh_key() {
     log "Copying SSH key to remote host..."
-    sshpass -p "$SSH_PASSWORD" ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"
-    log "SSH key successfully copied."
+    if sshpass -p "$SSH_PASSWORD" ssh-copy-id -i "$PUBLIC_KEY" -o StrictHostKeyChecking=no "${USERNAME}@${HOST}"; then
+        log "SSH key successfully copied."
+    else
+        log "Error: Failed to copy SSH key to remote host."
+        exit 1
+    fi
 }
 
 # Function to test SSH connection
@@ -89,7 +100,7 @@ test_ssh_connection() {
     if ssh -i "$PRIVATE_KEY" -o BatchMode=yes -o ConnectTimeout=5 "${USERNAME}@${HOST}" 'echo "SSH connection successful."'; then
         log "SSH connection to ${HOST} as ${USERNAME} is successful."
     else
-        log "SSH connection to ${HOST} as ${USERNAME} failed."
+        log "Error: SSH connection to ${HOST} as ${USERNAME} failed."
         exit 1
     fi
 }
