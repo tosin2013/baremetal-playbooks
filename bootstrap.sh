@@ -114,21 +114,21 @@ function load_env_vars {
 
 configure_ansible_vault() {
     log_message "Configuring Ansible Vault..."
-    if! command -v ansiblesafe &>/dev/null; then
+    if ! command -v ansiblesafe &>/dev/null; then
         local ansiblesafe_url="https://github.com/tosin2013/ansiblesafe/releases/download/v0.0.12/ansiblesafe-v0.0.14-linux-amd64.tar.gz"
-        if! curl -OL "$ansiblesafe_url"; then
+        if ! curl -OL "$ansiblesafe_url"; then
             log_message "Failed to download ansiblesafe"
             exit 1
         fi
-        if! tar -zxvf "ansiblesafe-v0.0.14-linux-amd64.tar.gz"; then
+        if ! tar -zxvf "ansiblesafe-v0.0.14-linux-amd64.tar.gz"; then
             log_message "Failed to extract ansiblesafe"
             exit 1
         fi
         chmod +x ansiblesafe-linux-amd64
         mv ansiblesafe-linux-amd64 /usr/local/bin/ansiblesafe
     fi
-    if [! -f "ansible_vault_setup.sh" ]; then
-        if! curl -OL https://gist.githubusercontent.com/tosin2013/022841d90216df8617244ab6d6aceaf8/raw/92400b9e459351d204feb67b985c08df6477d7fa/ansible_vault_setup.sh; then
+    if [ ! -f "ansible_vault_setup.sh" ]; then
+        if ! curl -OL https://gist.githubusercontent.com/tosin2013/022841d90216df8617244ab6d6aceaf8/raw/92400b9e459351d204feb67b985c08df6477d7fa/ansible_vault_setup.sh; then
             log_message "Failed to download ansible_vault_setup.sh"
             exit 1
         fi
