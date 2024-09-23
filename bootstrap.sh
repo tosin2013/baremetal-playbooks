@@ -207,6 +207,7 @@ function reformat_key {
 # Function to validate SSH key file
 function validate_key_file {
   local key_file="$1"
+  cat $key_file
   if ! ssh-keygen -lf "$key_file" > /dev/null 2>&1; then
     echo "ERROR: The private key in $key_file is invalid."
     exit 1
