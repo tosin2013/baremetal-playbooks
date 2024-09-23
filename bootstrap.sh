@@ -311,7 +311,7 @@ else
   exit 1
 fi
 
-load_env_vars
+load_env_vars --load-from-vault
 
 # Check if environment variables are loaded
 check_env_vars
@@ -373,6 +373,15 @@ update_yaml_variable "$OCP_AI_SVC_VARS_FILE" "json_body.inputs.hostname" "$NEW_H
 
 echo "Updated ocp-ai-svc-vars.yml:"
 cat "$OCP_AI_SVC_VARS_FILE"
+
+# Update pipeline-variables.yaml with AWS credentials
+echo "Updating pipeline-variables.yaml with AWS_ACCESS_KEY and AWS_SECRET_KEY..."
+update_yaml_variable "$PIPELINES_VARS" "aws_access_key" "$AWS_ACCESS_KEY"
+update_yaml_variable "$PIPELINES_VARS" "aws_secret_key" "$AWS_SECRET_KEY"
+
+echo "Updated pipeline-variables.yaml successfully:"
+cat "$PIPELINES_VARS"
+
 
 # Argument Parsing and Execution
 for arg in "$@"; do
