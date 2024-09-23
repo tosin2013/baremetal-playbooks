@@ -97,6 +97,7 @@ jobs:
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
           HCP_ORG_ID: ${{ secrets.HCP_ORG_ID }}
           HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
+          APP_NAME: ${{ secrets.APP_NAME }}
           USE_VAULT: ${{ secrets.USE_VAULT }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           GUID: ${{ inputs.GUID }}
