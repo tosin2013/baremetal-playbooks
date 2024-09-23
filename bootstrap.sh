@@ -54,6 +54,11 @@ function load_env_vars {
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
+      if [ -z $HCP_CLIENT_SECRET ];
+      then
+        echo "ERROR: HCP_CLIENT_SECRET environment variable is not set."
+        exit 1
+      fi
       hcp profile init --vault-secrets
       for var in SSH_PUBLIC_KEY SSH_PRIVATE_KEY GITHUB_TOKEN KCLI_PIPELINES_GITHUB_TOKEN OCP_AI_SVC_PIPELINES_GITHUB_TOKEN; do
         if [ -z "${!var}" ]; then
