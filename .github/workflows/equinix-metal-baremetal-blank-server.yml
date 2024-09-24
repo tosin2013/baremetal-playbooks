@@ -55,8 +55,9 @@ jobs:
       - name: Set up Python and Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip jq sshpass
+          sudo apt-get install -y python3-pip jq sshpass ansible
           pip3 install -r requirements.txt
+          ansible-galaxy install collections -r _build/requirements.yml
 
       - name: Set Up HCP CLI
         run: |
