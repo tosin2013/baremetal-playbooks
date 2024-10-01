@@ -109,8 +109,9 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           GUID: ${{ inputs.GUID }}
           OLLAMA: ${{ inputs.OLLAMA }}
+          CICD_ENVIORNMENT: github
         run: |
           source .env
           cat .env
-          #export inputs='{"NEW_HOST": "${NEW_HOST}", "NEW_USERNAME": "${NEW_USERNAME}", "NEW_DOMAIN": "${NEW_DOMAIN}", "NEW_FORWARDER": "${NEW_FORWARDER}", "FREEIPA_SERVER_FQDN": "${FREEIPA_SERVER_FQDN}", "FREEIPA_SERVER_DOMAIN": "${FREEIPA_SERVER_DOMAIN}", "GUID": "${GUID}", "OLLAMA": "${OLLAMA}"}'
+          #export inputs='{"NEW_HOST": "${NEW_HOST}", "NEW_USERNAME": "${NEW_USERNAME}", "NEW_DOMAIN": "${NEW_DOMAIN}", "NEW_FORWARDER": "${NEW_FORWARDER}", "FREEIPA_SERVER_FQDN": "${FREEIPA_SERVER_FQDN}", "FREEIPA_SERVER_DOMAIN": "${FREEIPA_SERVER_DOMAIN}", "GUID": "${GUID}", "OLLAMA": "${OLLAMA}", "CICD_ENVIORNMENT": "${CICD_ENVIORNMENT}"}'
           bash -x ./bootstrap.sh --push-ssh-key --push-pipeline-vars --trigger-github-pipelines --load-from-vault || exit $?
