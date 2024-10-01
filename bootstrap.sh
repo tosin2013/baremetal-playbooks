@@ -462,6 +462,9 @@ for arg in "$@"; do
         --debug-pipeline-vars)
         debug_pipeline_vars
         ;;
+        --load-from-vault)
+        load_env_vars --load-from-vault
+        ;;
         --help)
         usage
         ;;
