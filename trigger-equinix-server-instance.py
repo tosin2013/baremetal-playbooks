@@ -82,6 +82,100 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     update_secret_response = requests.put(update_secret_url, headers=headers, json=update_secret_data)
     update_secret_response.raise_for_status()
 
+def cli_main(args):
+    repo_owner = "tosin2013"
+    repo_name = "baremetal-playbooks"
+    workflow_id = "equinix-metal-baremetal-blank-server.yml"
+    token = os.getenv("GITHUB_TOKEN")
+
+    inputs = {
+        "NEW_HOST": args.new_host,
+        "NEW_USERNAME": args.new_username,
+        "NEW_DOMAIN": args.new_domain,
+        "NEW_FORWARDER": args.new_forwarder,
+        "FREEIPA_SERVER_FQDN": args.freeipa_server_fqdn,
+        "FREEIPA_SERVER_DOMAIN": args.freeipa_server_domain,
+        "GUID": args.guid,
+        "OLLAMA": args.ollama
+    }
+
+    ssh_password = args.ssh_password
+    aws_access_key = args.aws_access_key
+    aws_secret_key = args.aws_secret_key
+
+    update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
+    update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
+    update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+
+    trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
+    print("Pipeline has been triggered successfully.")
+
+def gui_main():
+    st.title("Equinix Metal Server Instance Trigger")
+
+    defaults = get_defaults()
+    if defaults:
+        ssh_password = st.text_input("SSH Password", type="password", value=defaults[1])
+        aws_access_key = st.text_input("AWS Access Key", type="password", value=defaults[2])
+        aws_secret_key = st.text_input("AWS Secret Key", type="password", value=defaults[3])
+        new_host = st.text_input("New Host Name", value=defaults[4])
+        new_username = st.text_input("New Username", value=defaults[5])
+        new_domain = st.text_input("New Domain", value=defaults[6])
+        new_forwarder = st.text_input("New Forwarder IP", value=defaults[7])
+        freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN", value=defaults[8])
+        freeipa_server_domain = st.text_input("FreeIPA Server Domain", value=defaults[9])
+        guid = st.text_input("GUID", value=defaults[10])
+        ollama = st.text_input("OLLAMA", value=defaults[11])
+    else:
+        ssh_password = st.text_input("SSH Password", type="password")
+        aws_access_key = st.text_input("AWS Access Key", type="password")
+        aws_secret_key = st.text_input("AWS Secret Key", type="password")
+        new_host = st.text_input("New Host Name")
+        new_username = st.text_input("New Username")
+        new_domain = st.text_input("New Domain")
+        new_forwarder = st.text_input("New Forwarder IP")
+        freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN")
+        freeipa_server_domain = st.text_input("FreeIPA Server Domain")
+        guid = st.text_input("GUID")
+        ollama = st.text_input("OLLAMA")
+
+    if st.button("Trigger Pipeline"):
+        repo_owner = "tosin2013"
+        repo_name = "baremetal-playbooks"
+        workflow_id = "equinix-metal-baremetal-blank-server.yml"
+        token = os.getenv("GITHUB_TOKEN")
+
+        inputs = {
+            "NEW_HOST": new_host,
+            "NEW_USERNAME": new_username,
+            "NEW_DOMAIN": new_domain,
+            "NEW_FORWARDER": new_forwarder,
+            "FREEIPA_SERVER_FQDN": freeipa_server_fqdn,
+            "FREEIPA_SERVER_DOMAIN": freeipa_server_domain,
+            "GUID": guid,
+            "OLLAMA": ollama
+        }
+
+        update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
+        update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
+        update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+
+        save_defaults((
+            ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
+            freeipa_server_fqdn, freeipa_server_domain, guid, ollama
+        ))
+
+        trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
+        st.success("Pipeline has been triggered successfully.")
+
+    # Add the "Save Variables" button
+    if st.button("Save Variables"):
+        save_defaults((
+            ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
+            freeipa_server_fqdn, freeipa_server_domain, guid, ollama
+        ))
+        st.success("Variables have been saved successfully.")
+
 def main():
     init_db()
     parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
@@ -100,97 +194,9 @@ def main():
     args = parser.parse_args()
 
     if args.gui:
-        st.title("Equinix Metal Server Instance Trigger")
-
-        defaults = get_defaults()
-        if defaults:
-            ssh_password = st.text_input("SSH Password", type="password", value=defaults[1])
-            aws_access_key = st.text_input("AWS Access Key", type="password", value=defaults[2])
-            aws_secret_key = st.text_input("AWS Secret Key", type="password", value=defaults[3])
-            new_host = st.text_input("New Host Name", value=defaults[4])
-            new_username = st.text_input("New Username", value=defaults[5])
-            new_domain = st.text_input("New Domain", value=defaults[6])
-            new_forwarder = st.text_input("New Forwarder IP", value=defaults[7])
-            freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN", value=defaults[8])
-            freeipa_server_domain = st.text_input("FreeIPA Server Domain", value=defaults[9])
-            guid = st.text_input("GUID", value=defaults[10])
-            ollama = st.text_input("OLLAMA", value=defaults[11])
-        else:
-            ssh_password = st.text_input("SSH Password", type="password")
-            aws_access_key = st.text_input("AWS Access Key", type="password")
-            aws_secret_key = st.text_input("AWS Secret Key", type="password")
-            new_host = st.text_input("New Host Name")
-            new_username = st.text_input("New Username")
-            new_domain = st.text_input("New Domain")
-            new_forwarder = st.text_input("New Forwarder IP")
-            freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN")
-            freeipa_server_domain = st.text_input("FreeIPA Server Domain")
-            guid = st.text_input("GUID")
-            ollama = st.text_input("OLLAMA")
-
-        if st.button("Trigger Pipeline"):
-            repo_owner = "tosin2013"
-            repo_name = "baremetal-playbooks"
-            workflow_id = "equinix-metal-baremetal-blank-server.yml"
-            token = os.getenv("GITHUB_TOKEN")
-
-            inputs = {
-                "NEW_HOST": new_host,
-                "NEW_USERNAME": new_username,
-                "NEW_DOMAIN": new_domain,
-                "NEW_FORWARDER": new_forwarder,
-                "FREEIPA_SERVER_FQDN": freeipa_server_fqdn,
-                "FREEIPA_SERVER_DOMAIN": freeipa_server_domain,
-                "GUID": guid,
-                "OLLAMA": ollama
-            }
-
-            update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
-            update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
-            update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
-
-            save_defaults((
-                ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
-                freeipa_server_fqdn, freeipa_server_domain, guid, ollama
-            ))
-
-            trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
-            st.success("Pipeline has been triggered successfully.")
-
-        # Add the "Save Variables" button
-        if st.button("Save Variables"):
-            save_defaults((
-                ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
-                freeipa_server_fqdn, freeipa_server_domain, guid, ollama
-            ))
-            st.success("Variables have been saved successfully.")
+        gui_main()
     else:
-        repo_owner = "tosin2013"
-        repo_name = "baremetal-playbooks"
-        workflow_id = "equinix-metal-baremetal-blank-server.yml"
-        token = os.getenv("GITHUB_TOKEN")
-
-        inputs = {
-            "NEW_HOST": args.new_host,
-            "NEW_USERNAME": args.new_username,
-            "NEW_DOMAIN": args.new_domain,
-            "NEW_FORWARDER": args.new_forwarder,
-            "FREEIPA_SERVER_FQDN": args.freeipa_server_fqdn,
-            "FREEIPA_SERVER_DOMAIN": args.freeipa_server_domain,
-            "GUID": args.guid,
-            "OLLAMA": args.ollama
-        }
-
-        ssh_password = args.ssh_password
-        aws_access_key = args.aws_access_key
-        aws_secret_key = args.aws_secret_key
-
-        update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
-        update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
-        update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
-
-        trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
-        print("Pipeline has been triggered successfully.")
+        cli_main(args)
 
 if __name__ == "__main__":
     main()
