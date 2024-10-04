@@ -156,6 +156,14 @@ def main():
 
             trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
             st.success("Pipeline has been triggered successfully.")
+
+        # Add the "Save Variables" button
+        if st.button("Save Variables"):
+            save_defaults((
+                ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
+                freeipa_server_fqdn, freeipa_server_domain, guid, ollama
+            ))
+            st.success("Variables have been saved successfully.")
     else:
         repo_owner = "tosin2013"
         repo_name = "baremetal-playbooks"
