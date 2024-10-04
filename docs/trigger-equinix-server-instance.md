@@ -1,36 +1,78 @@
-# How to Run the `trigger-equinix-server-instance.py` Script
+# Trigger Equinix Metal Server Instance
 
-To trigger an Equinix Metal server instance and update the SSH password, you can use the `trigger-equinix-server-instance.py` script. This script requires several arguments to be passed to it. Below is an example command:
+This script allows you to trigger an Equinix Metal server instance and update SSH passwords. It can be run from the command line or via a Streamlit GUI.
+
+## Prerequisites
+
+- Python 3.x
+- Streamlit (if using the GUI)
+- `requests` library
+- `pynacl` library
+
+You can install the required Python packages using pip:
+
+```bash
+pip install streamlit requests pynacl
+```
+
+## Running the Script
+
+### From the Command Line
+
+To run the script from the command line, use the following command:
 
 ```bash
 python trigger-equinix-server-instance.py \
-    --ssh_password "your_ssh_password" \
-    --aws_access_key "your_aws_access_key" \
-    --aws_secret_key "your_aws_secret_key" \
-    --new_host "new_host_name" \
-    --new_username "new_username" \
-    --new_domain "new_domain" \
-    --new_forwarder "new_forwarder_ip" \
-    --freeipa_server_fqdn "freeipa_server_fqdn" \
-    --freeipa_server_domain "freeipa_server_domain" \
-    --guid "your_guid" \
-    --ollama "true"
+    --ssh_password YOUR_SSH_PASSWORD \
+    --aws_access_key YOUR_AWS_ACCESS_KEY \
+    --aws_secret_key YOUR_AWS_SECRET_KEY \
+    --new_host NEW_HOST_NAME \
+    --new_username NEW_USERNAME \
+    --new_domain NEW_DOMAIN \
+    --new_forwarder NEW_FORWARDER_IP \
+    --freeipa_server_fqdn FREEIPA_SERVER_FQDN \
+    --freeipa_server_domain FREEIPA_SERVER_DOMAIN \
+    --guid GUID \
+    --ollama OLLAMA
 ```
 
-### Required Arguments:
-- `--ssh_password`: The SSH password to use.
-- `--aws_access_key`: The AWS Access Key.
-- `--aws_secret_key`: The AWS Secret Key.
-- `--new_host`: The new host name.
-- `--new_username`: The new username.
-- `--new_domain`: The new domain.
-- `--new_forwarder`: The new forwarder IP.
-- `--freeipa_server_fqdn`: The FreeIPA server FQDN.
-- `--freeipa_server_domain`: The FreeIPA server domain.
-- `--guid`: The GUID.
-- `--ollama`: The OLLAMA value.
+### Using the Streamlit GUI
 
-Make sure to replace the placeholders with actual values when running the script.
+To start the Streamlit GUI, use the following command:
 
-### GitHub Token Permissions
-Ensure that the GitHub token used has the `repo` scope to access repository secrets.
+```bash
+streamlit run trigger-equinix-server-instance.py -- --gui
+```
+
+This will open a web browser with a user-friendly interface where you can input the required parameters and trigger the pipeline.
+
+## GUI Interface
+
+The Streamlit GUI provides a simple form for entering the necessary parameters:
+
+- **SSH Password**: The SSH password to use.
+- **AWS Access Key**: Your AWS access key.
+- **AWS Secret Key**: Your AWS secret key.
+- **New Host Name**: The new host name.
+- **New Username**: The new username.
+- **New Domain**: The new domain.
+- **New Forwarder IP**: The new forwarder IP.
+- **FreeIPA Server FQDN**: The FreeIPA server FQDN.
+- **FreeIPA Server Domain**: The FreeIPA server domain.
+- **GUID**: The GUID.
+- **OLLAMA**: The OLLAMA.
+
+After filling in the form, click the "Trigger Pipeline" button to start the process.
+
+## Environment Variables
+
+Ensure that the `GITHUB_TOKEN` environment variable is set with your GitHub token:
+
+```bash
+export GITHUB_TOKEN=your_github_token
+```
+
+## Notes
+
+- The script requires a GitHub token with the necessary permissions to trigger workflows and update secrets.
+- The GUI is designed to be user-friendly, making it accessible to non-technical users.
