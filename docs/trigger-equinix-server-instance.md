@@ -8,6 +8,7 @@ This script allows you to trigger an Equinix Metal server instance and update SS
 - Streamlit (if using the GUI)
 - `requests` library
 - `pynacl` library
+- `sqlite3` library
 
 You can install the required Python packages using pip:
 
@@ -46,6 +47,8 @@ streamlit run trigger-equinix-server-instance.py -- --gui
 
 This will open a web browser with a user-friendly interface where you can input the required parameters and trigger the pipeline.
 
+The GUI will load default values from a SQLite database if they are available, so you don't have to type them in every time.
+
 ## GUI Interface
 
 The Streamlit GUI provides a simple form for entering the necessary parameters:
@@ -76,3 +79,4 @@ export GITHUB_TOKEN=your_github_token
 
 - The script requires a GitHub token with the necessary permissions to trigger workflows and update secrets.
 - The GUI is designed to be user-friendly, making it accessible to non-technical users.
+- The GUI now supports a SQLite database to store and retrieve default values, making it more convenient for users.

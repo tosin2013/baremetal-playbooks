@@ -5,6 +5,46 @@ import nacl.encoding
 import nacl.public
 import nacl.utils
 import streamlit as st
+import sqlite3
+from contextlib import closing
+
+def init_db():
+    with closing(sqlite3.connect('defaults.db')) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS defaults (
+                    id INTEGER PRIMARY KEY,
+                    ssh_password TEXT,
+                    aws_access_key TEXT,
+                    aws_secret_key TEXT,
+                    new_host TEXT,
+                    new_username TEXT,
+                    new_domain TEXT,
+                    new_forwarder TEXT,
+                    freeipa_server_fqdn TEXT,
+                    freeipa_server_domain TEXT,
+                    guid TEXT,
+                    ollama TEXT
+                )
+            ''')
+        conn.commit()
+
+def get_defaults():
+    with closing(sqlite3.connect('defaults.db')) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute('SELECT * FROM defaults ORDER BY id DESC LIMIT 1')
+            return cursor.fetchone()
+
+def save_defaults(defaults):
+    with closing(sqlite3.connect('defaults.db')) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute('''
+                INSERT INTO defaults (
+                    ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
+                    freeipa_server_fqdn, freeipa_server_domain, guid, ollama
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', defaults)
+        conn.commit()
 
 def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows/{workflow_id}/dispatches"
@@ -43,6 +83,7 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     update_secret_response.raise_for_status()
 
 def main():
+    init_db()
     parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
     parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=False)
     parser.add_argument('--aws_access_key', type=str, help='AWS Access Key', required=False)
@@ -61,17 +102,31 @@ def main():
     if args.gui:
         st.title("Equinix Metal Server Instance Trigger")
 
-        ssh_password = st.text_input("SSH Password", type="password")
-        aws_access_key = st.text_input("AWS Access Key", type="password")
-        aws_secret_key = st.text_input("AWS Secret Key", type="password")
-        new_host = st.text_input("New Host Name")
-        new_username = st.text_input("New Username")
-        new_domain = st.text_input("New Domain")
-        new_forwarder = st.text_input("New Forwarder IP")
-        freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN")
-        freeipa_server_domain = st.text_input("FreeIPA Server Domain")
-        guid = st.text_input("GUID")
-        ollama = st.text_input("OLLAMA")
+        defaults = get_defaults()
+        if defaults:
+            ssh_password = st.text_input("SSH Password", type="password", value=defaults[1])
+            aws_access_key = st.text_input("AWS Access Key", type="password", value=defaults[2])
+            aws_secret_key = st.text_input("AWS Secret Key", type="password", value=defaults[3])
+            new_host = st.text_input("New Host Name", value=defaults[4])
+            new_username = st.text_input("New Username", value=defaults[5])
+            new_domain = st.text_input("New Domain", value=defaults[6])
+            new_forwarder = st.text_input("New Forwarder IP", value=defaults[7])
+            freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN", value=defaults[8])
+            freeipa_server_domain = st.text_input("FreeIPA Server Domain", value=defaults[9])
+            guid = st.text_input("GUID", value=defaults[10])
+            ollama = st.text_input("OLLAMA", value=defaults[11])
+        else:
+            ssh_password = st.text_input("SSH Password", type="password")
+            aws_access_key = st.text_input("AWS Access Key", type="password")
+            aws_secret_key = st.text_input("AWS Secret Key", type="password")
+            new_host = st.text_input("New Host Name")
+            new_username = st.text_input("New Username")
+            new_domain = st.text_input("New Domain")
+            new_forwarder = st.text_input("New Forwarder IP")
+            freeipa_server_fqdn = st.text_input("FreeIPA Server FQDN")
+            freeipa_server_domain = st.text_input("FreeIPA Server Domain")
+            guid = st.text_input("GUID")
+            ollama = st.text_input("OLLAMA")
 
         if st.button("Trigger Pipeline"):
             repo_owner = "tosin2013"
@@ -93,6 +148,11 @@ def main():
             update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
             update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
             update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+
+            save_defaults((
+                ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
+                freeipa_server_fqdn, freeipa_server_domain, guid, ollama
+            ))
 
             trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
             st.success("Pipeline has been triggered successfully.")
