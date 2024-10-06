@@ -56,11 +56,12 @@ def save_defaults(defaults):
 def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
     """Trigger a GitHub action with the provided inputs."""
     url = (
-        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows/{workflow_id}/dispatches"
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
+        f"actions/workflows/{workflow_id}/dispatches"
     )
     headers = {
         "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
+        "Accept": "application/vnd.github.v3+json"
     }
     data = {
         "ref": "main",
@@ -73,7 +74,8 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
 def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token):
     """Update a GitHub secret with the provided value."""
     public_key_url = (
-        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/public-key"
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
+        f"actions/secrets/public-key"
     )
     headers = {
         "Authorization": f"token {token}",
@@ -90,7 +92,8 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     encrypted = sealed_box.encrypt(secret_value.encode())
     
     update_secret_url = (
-        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/{secret_name}"
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
+        f"actions/secrets/{secret_name}"
     )
     update_secret_data = {
         "encrypted_value": nacl.encoding.Base64Encoder.encode(encrypted).decode(),
