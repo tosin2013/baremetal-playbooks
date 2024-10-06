@@ -29,13 +29,13 @@ with your changes.
 ## Prerequisites
 
 **Install pip packages**
-```
+```bash
 pip3 install -r requirements.txt
 ```
 
 **Optional: Login to Vault**
 If you plan to use the `--load-from-vault` flag in the `bootstrap.sh` script, ensure you are logged into Vault:
-```
+```bash
 export HCP_CLIENT_ID=your_client_id
 export HCP_CLIENT_SECRET=your_client_secret
 export USE_VAULT=true
@@ -91,7 +91,6 @@ This code selection consists of a series of commands written in Markdown format.
 6. `ansible-playbook -i hosts  playbooks/trigger-github-pipelines.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `trigger-github-pipelines.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
 
 7. `ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`: This command executes the Ansible playbook `populate-hostnames-on-freeipa.yaml` using the inventory file `hosts` and the variables defined in `freeipa-vars.yml`.
-
 
 # ansible-galaxy collection install community.general
 `ansible-playbook -i hosts  playbooks/populate-hostnames-on-freeipa.yaml  -e "@freeipa-vars.yml"`
