@@ -6,6 +6,7 @@ import argparse
 import os
 import sqlite3
 from contextlib import closing
+
 import requests
 import nacl.encoding
 import nacl.public
@@ -33,16 +34,6 @@ def init_db():
                 )
             ''')
         conn.commit()
-
-import argparse
-import os
-import sqlite3
-from contextlib import closing
-import requests
-import nacl.encoding
-import nacl.public
-import nacl.utils
-import streamlit as st
 
 def init_db():
     """Initialize the SQLite database."""
