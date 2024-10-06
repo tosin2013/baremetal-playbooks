@@ -1,14 +1,19 @@
+"""
+Module to trigger Equinix Metal server instance and update SSH password.
+"""
+
 import argparse
-import requests
 import os
+import sqlite3
+from contextlib import closing
+import requests
 import nacl.encoding
 import nacl.public
 import nacl.utils
 import streamlit as st
-import sqlite3
-from contextlib import closing
 
 def init_db():
+    """Initialize the SQLite database."""
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('''
@@ -30,12 +35,14 @@ def init_db():
         conn.commit()
 
 def get_defaults():
+    """Retrieve the latest defaults from the database."""
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('SELECT * FROM defaults ORDER BY id DESC LIMIT 1')
             return cursor.fetchone()
 
 def save_defaults(defaults):
+    """Save the provided defaults to the database."""
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('''
@@ -47,7 +54,10 @@ def save_defaults(defaults):
         conn.commit()
 
 def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
-    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows/{workflow_id}/dispatches"
+    """Trigger a GitHub action with the provided inputs."""
+    url = (
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows/{workflow_id}/dispatches"
+    )
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
@@ -61,7 +71,10 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
 
 
 def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token):
-    public_key_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/public-key"
+    """Update a GitHub secret with the provided value."""
+    public_key_url = (
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/public-key"
+    )
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
@@ -70,11 +83,15 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     public_key_response.raise_for_status()
     public_key_data = public_key_response.json()
     
-    public_key = nacl.public.PublicKey(public_key_data['key'].encode(), encoder=nacl.encoding.Base64Encoder)
+    public_key = nacl.public.PublicKey(
+        public_key_data['key'].encode(), encoder=nacl.encoding.Base64Encoder
+    )
     sealed_box = nacl.public.SealedBox(public_key)
     encrypted = sealed_box.encrypt(secret_value.encode())
     
-    update_secret_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/{secret_name}"
+    update_secret_url = (
+        f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/secrets/{secret_name}"
+    )
     update_secret_data = {
         "encrypted_value": nacl.encoding.Base64Encoder.encode(encrypted).decode(),
         "key_id": public_key_data['key_id']
@@ -83,6 +100,7 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     update_secret_response.raise_for_status()
 
 def cli_main(args):
+    """Main function for CLI execution."""
     repo_owner = "tosin2013"
     repo_name = "baremetal-playbooks"
     workflow_id = "equinix-metal-baremetal-blank-server.yml"
@@ -111,6 +129,7 @@ def cli_main(args):
     print("Pipeline has been triggered successfully.")
 
 def gui_main():
+    """Main function for GUI execution using Streamlit."""
     st.title("Equinix Metal Server Instance Trigger")
 
     defaults = get_defaults()
@@ -177,6 +196,7 @@ def gui_main():
         st.success("Variables have been saved successfully.")
 
 def main():
+    """Main entry point of the application."""
     init_db()
     parser = argparse.ArgumentParser(description="Trigger Equinix Metal server instance and update SSH password.")
     parser.add_argument('--ssh_password', type=str, help='SSH password to use', required=False)
