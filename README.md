@@ -41,6 +41,39 @@ export HCP_CLIENT_SECRET=your_client_secret
 export USE_VAULT=true
 ```
 
+## Running the Pipeline
+
+### From the Command Line
+
+To run the script from the command line, use the following command:
+
+```bash
+python trigger-equinix-server-instance.py \
+    --ssh_password YOUR_SSH_PASSWORD \
+    --aws_access_key YOUR_AWS_ACCESS_KEY \
+    --aws_secret_key YOUR_AWS_SECRET_KEY \
+    --new_host NEW_HOST_NAME \
+    --new_username NEW_USERNAME \
+    --new_domain NEW_DOMAIN \
+    --new_forwarder NEW_FORWARDER_IP \
+    --freeipa_server_fqdn FREEIPA_SERVER_FQDN \
+    --freeipa_server_domain FREEIPA_SERVER_DOMAIN \
+    --guid GUID \
+    --ollama OLLAMA
+```
+
+### Using the Streamlit GUI
+
+To start the Streamlit GUI, use the following command:
+
+```bash
+streamlit run trigger-equinix-server-instance.py -- --gui
+```
+
+This will open a web browser with a user-friendly interface where you can input the required parameters and trigger the pipeline.
+
+The GUI will load default values from a SQLite database if they are available, so you don't have to type them in every time.
+
 ## Playbooks
 
 This code selection consists of a series of commands written in Markdown format. These commands are used to execute various Ansible playbooks for different purposes. Here's a breakdown of the commands:
