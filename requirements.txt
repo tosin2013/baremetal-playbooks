@@ -1,3 +1,2 @@
 PyNaCl
 streamlit
-sqlite3
