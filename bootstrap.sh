@@ -12,7 +12,7 @@
 #   --debug-pipeline-vars      Debug the pipeline variables YAML file.
 #   --help                     Display usage information.
 
-export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+#export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 set -euo pipefail
 
 # Function to log messages

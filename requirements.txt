@@ -1,1 +1,3 @@
 PyNaCl
+streamlit
+sqlite3
