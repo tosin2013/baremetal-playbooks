@@ -4,7 +4,7 @@ cython>=3.0.5; python_version >= "3.12"
 # ordered:
 ansible-pylibssh==1.1.0
 ansible-runner==2.4.0
-ansible-lint[lock]==6.21.1
+ansible-lint[lock]==24.9.2
 molecule==24.9.0
 molecule-plugins[podman]==23.5.3
 paramiko==3.4.0  # https://github.com/ansible/baremetal-playbooks/issues/140
