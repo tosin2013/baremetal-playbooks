@@ -83,7 +83,7 @@ def test_trigger_github_action(mock_post):
 @patch('requests.get')
 @patch('requests.put')
 def test_update_github_secret(mock_put, mock_get):
-    mock_get.return_value.json.return_value = {'key': 'public_key', 'key_id': 'key_id'}
+    mock_get.return_value.json.return_value = {'key': 'cHVibGljX2tleQ==', 'key_id': 'key_id'}
     mock_put.return_value.status_code = 204
     update_github_secret('owner', 'repo', 'secret_name', 'secret_value', 'token')
     mock_get.assert_called_once_with(
@@ -151,7 +151,7 @@ def test_cli_main(mock_trigger, mock_update):
 def test_gui_main(mock_trigger, mock_update, mock_getenv, mock_success, mock_button, mock_text_input):
     mock_getenv.return_value = 'token'
     mock_text_input.side_effect = [
-        'password', 'access_key', 'secret_key', 'host', 'username', 'domain', 'forwarder', 'fqdn', 'domain', 'guid', 'ollama', 'runner_token'
+        'password', 'access_key', 'secret_key', 'host', 'username', 'domain', 'forwarder', 'fqdn', 'domain', 'guid', 'ollama'
     ]
     mock_button.side_effect = [False, True]
     gui_main()
