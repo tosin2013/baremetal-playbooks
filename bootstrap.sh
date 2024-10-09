@@ -214,6 +214,7 @@ function check_env_vars {
     OLLAMA
     AWS_ACCESS_KEY
     AWS_SECRET_KEY
+    KCLI_PIPELINES_RUNNER_TOKEN
   )
 
   for var in "${required_vars[@]}"; do
@@ -421,6 +422,9 @@ cat "$OCP_AI_SVC_VARS_FILE"
 echo "Updating pipeline-variables.yaml with AWS_ACCESS_KEY and AWS_SECRET_KEY..."
 update_yaml_variable "$PIPELINES_VARS" "aws_access_key" "$AWS_ACCESS_KEY"
 update_yaml_variable "$PIPELINES_VARS" "aws_secret_key" "$AWS_SECRET_KEY"
+
+echo "Updated pipeline-variables.yaml with KCLI_PIPELINES_RUNNER_TOKEN credentials."
+update_yaml_variable "$PIPELINES_VARS" "kcli_pipelines_runner_token" "$KCLI_PIPELINES_RUNNER_TOKEN"
 
 echo "Updated pipeline-variables.yaml successfully:"
 cat "$PIPELINES_VARS"

@@ -89,6 +89,7 @@ jobs:
           echo 'export APP_NAME="${{ secrets.APP_NAME }}"' >> .env
           echo 'export AWS_SECRET_KEY="${{ secrets.AWS_SECRET_KEY }}"' >> .env
           echo 'export AWS_ACCESS_KEY="${{ secrets.AWS_ACCESS_KEY }}"' >> .env
+          echo 'export KCLI_PIPELINES_RUNNER_TOKEN="${{ secrets.KCLI_PIPELINES_RUNNER_TOKEN }}"' >> .env
 
       - name: Set Executable Permissions
         run: chmod +x bootstrap.sh

@@ -10,3 +10,4 @@ openshift_pull_secret: pullsecret
 freeipa_server_admin_password: password
 aws_access_key: accesskey
 aws_secret_key: secretkey
+kcli_pipelines_runner_token: token
