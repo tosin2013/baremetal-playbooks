@@ -62,7 +62,6 @@ python trigger-equinix-server-instance.py \
     --freeipa_server_domain FREEIPA_SERVER_DOMAIN \
     --guid GUID \
     --ollama OLLAMA \
-    --kcli_pipelines_runner_token YOUR_KCLI_PIPELINES_RUNNER_TOKEN \
     --kcli_pipelines_github_token YOUR_KCLI_PIPELINES_GITHUB_TOKEN
 ```
 
