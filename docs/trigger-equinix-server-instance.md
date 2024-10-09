@@ -45,8 +45,6 @@ The `KCLI_PIPELINES_RUNNER_TOKEN` is a secret token used to authenticate with th
 
 The `KCLI_PIPELINES_GITHUB_TOKEN` is a GitHub token used to authenticate with the GitHub repository. This token is required to update GitHub secrets and trigger workflows.
 
-The `KCLI_PIPELINES_RUNNER_TOKEN` is a secret token used to authenticate with the KCLI pipelines runner. This token is required to trigger certain pipelines.
-
 ### Command Line Example
 
 When running the script from the command line, include the `--kcli_pipelines_runner_token` argument:
