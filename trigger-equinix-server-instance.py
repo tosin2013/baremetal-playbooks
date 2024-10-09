@@ -225,7 +225,6 @@ def main():
     parser.add_argument('--guid', type=str, help='GUID', required=False)
     parser.add_argument('--ollama', type=str, help='OLLAMA', required=False)
     parser.add_argument('--kcli_pipelines_github_token', type=str, help='GitHub Token for KCLI Pipelines', required=True)
-    parser.add_argument('--kcli_pipelines_github_token', type=str, help='GitHub Token for KCLI Pipelines', required=True)
     parser.add_argument('--gui', action='store_true', help='Start the Streamlit GUI')
     args = parser.parse_args()
 
