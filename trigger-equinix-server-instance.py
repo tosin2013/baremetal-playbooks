@@ -175,6 +175,7 @@ def gui_main():
         repo_name = "baremetal-playbooks"
         workflow_id = "equinix-metal-baremetal-blank-server.yml"
         token = os.getenv("KCLI_PIPELINES_GITHUB_TOKEN")
+        kcli_pipelines_runner_token = st.text_input("KCLI Pipelines Runner Token", type="password", value=os.getenv("KCLI_PIPELINES_RUNNER_TOKEN", ""))
 
         inputs = {
             "NEW_HOST": new_host,
