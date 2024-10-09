@@ -152,7 +152,7 @@ def cli_main(args):
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
     update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
-    update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
+    update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, kcli_pipelines_github_token)
     update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", args.kcli_pipelines_runner_token, token)
     update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
 
@@ -177,6 +177,7 @@ def gui_main():
         guid = st.text_input("GUID", value=defaults[10])
         ollama = st.text_input("OLLAMA", value=defaults[11])
         kcli_pipelines_runner_token = st.text_input("KCLI Pipelines Runner Token", type="password", value=defaults[12] if defaults else "")
+        kcli_pipelines_github_token = st.text_input("KCLI Pipelines GitHub Token", type="password", value=os.getenv("KCLI_PIPELINES_GITHUB_TOKEN", ""))
     else:
         ssh_password = st.text_input("SSH Password", type="password")
         aws_access_key = st.text_input("AWS Access Key", type="password")
@@ -244,6 +245,7 @@ def main():
     parser.add_argument('--guid', type=str, help='GUID', required=False)
     parser.add_argument('--ollama', type=str, help='OLLAMA', required=False)
     parser.add_argument('--kcli_pipelines_runner_token', type=str, help='KCLI Pipelines Runner Token', required=False)
+    parser.add_argument('--kcli_pipelines_github_token', type=str, help='GitHub Token for KCLI Pipelines', required=True)
     parser.add_argument('--kcli_pipelines_github_token', type=str, help='GitHub Token for KCLI Pipelines', required=True)
     parser.add_argument('--gui', action='store_true', help='Start the Streamlit GUI')
     args = parser.parse_args()
