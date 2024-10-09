@@ -244,7 +244,6 @@ def main():
     parser.add_argument('--guid', type=str, help='GUID', required=False)
     parser.add_argument('--ollama', type=str, help='OLLAMA', required=False)
     parser.add_argument('--kcli_pipelines_runner_token', type=str, help='KCLI Pipelines Runner Token', required=False)
-    parser.add_argument('--kcli_pipelines_runner_token', type=str, help='KCLI Pipelines Runner Token', required=False)
     parser.add_argument('--gui', action='store_true', help='Start the Streamlit GUI')
     args = parser.parse_args()
 
