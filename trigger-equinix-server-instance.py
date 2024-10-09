@@ -171,6 +171,7 @@ def gui_main():
         freeipa_server_domain = st.text_input("FreeIPA Server Domain", value=defaults[9])
         guid = st.text_input("GUID", value=defaults[10])
         ollama = st.text_input("OLLAMA", value=defaults[11])
+        kcli_pipelines_runner_token = st.text_input("KCLI Pipelines Runner Token", type="password")
     else:
         ssh_password = st.text_input("SSH Password", type="password")
         aws_access_key = st.text_input("AWS Access Key", type="password")
@@ -204,6 +205,8 @@ def gui_main():
         update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
         update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
         update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+        update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
+        update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", args.kcli_pipelines_runner_token, token)
 
         save_defaults((
             ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
@@ -236,6 +239,7 @@ def main():
     parser.add_argument('--freeipa_server_domain', type=str, help='FreeIPA server domain', required=False)
     parser.add_argument('--guid', type=str, help='GUID', required=False)
     parser.add_argument('--ollama', type=str, help='OLLAMA', required=False)
+    parser.add_argument('--kcli_pipelines_runner_token', type=str, help='KCLI Pipelines Runner Token', required=False)
     parser.add_argument('--gui', action='store_true', help='Start the Streamlit GUI')
     args = parser.parse_args()
 

@@ -37,6 +37,34 @@ python trigger-equinix-server-instance.py \
     --ollama OLLAMA
 ```
 
+### KCLI Pipelines Runner Token
+
+The `KCLI_PIPELINES_RUNNER_TOKEN` is a secret token used to authenticate with the KCLI pipelines runner. This token is required to trigger certain pipelines.
+
+### Command Line Example
+
+When running the script from the command line, include the `--kcli_pipelines_runner_token` argument:
+
+```bash
+python trigger-equinix-server-instance.py \
+    --ssh_password YOUR_SSH_PASSWORD \
+    --aws_access_key YOUR_AWS_ACCESS_KEY \
+    --aws_secret_key YOUR_AWS_SECRET_KEY \
+    --new_host NEW_HOST_NAME \
+    --new_username NEW_USERNAME \
+    --new_domain NEW_DOMAIN \
+    --new_forwarder NEW_FORWARDER_IP \
+    --freeipa_server_fqdn FREEIPA_SERVER_FQDN \
+    --freeipa_server_domain FREEIPA_SERVER_DOMAIN \
+    --guid GUID \
+    --ollama OLLAMA \
+    --kcli_pipelines_runner_token YOUR_KCLI_PIPELINES_RUNNER_TOKEN
+```
+
+### GUI Interface
+
+In the Streamlit GUI, you will find a field labeled "KCLI Pipelines Runner Token" where you can input the token.
+
 ### Using the Streamlit GUI
 
 To start the Streamlit GUI, use the following command:
