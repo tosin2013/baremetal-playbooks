@@ -71,7 +71,7 @@ def save_defaults(defaults):
             cursor.execute('''
                 INSERT INTO defaults (
                     ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
-                    freeipa_server_fqdn, freeipa_server_domain, guid, ollama, kcli_pipelines_runner_token
+                    freeipa_server_fqdn, freeipa_server_domain, guid, ollama
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', defaults)
         conn.commit()
