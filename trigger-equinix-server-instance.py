@@ -70,6 +70,11 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
         "inputs": inputs
     }
     response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 204:
+        print("GitHub Action triggered successfully.")
+    else:
+        print(f"Failed to trigger GitHub Action. Status code: {response.status_code}")
+        print(f"Response: {response.text}")
     response.raise_for_status()
 
 
