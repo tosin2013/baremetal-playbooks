@@ -151,7 +151,6 @@ def cli_main(args):
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
     update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
-    update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
 
     trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
     print("Pipeline has been triggered successfully.")
@@ -211,7 +210,7 @@ def gui_main():
 
         save_defaults((
             ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
-            freeipa_server_fqdn, freeipa_server_domain, guid, ollama, kcli_pipelines_runner_token
+            freeipa_server_fqdn, freeipa_server_domain, guid, ollama
         ))
 
         trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
