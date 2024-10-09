@@ -44,6 +44,7 @@ def test_init_db(mock_db_connection):
         )"""
     )
     mock_conn.commit.assert_called_once()
+    mock_conn.close.assert_called_once()
 
 
 # Test get_defaults function
