@@ -2,7 +2,7 @@
 # see: https://github.com/yaml/pyyaml/issues/601
 cython>=3.0.5; python_version >= "3.12"
 # ordered:
-ansible-pylibssh==1.1.0
+ansible-pylibssh==1.2.2
 ansible-runner==2.4.0
 ansible-lint[lock]==6.21.1
 molecule==24.9.0
