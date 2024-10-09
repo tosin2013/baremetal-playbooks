@@ -41,6 +41,12 @@ python trigger-equinix-server-instance.py \
 
 The `KCLI_PIPELINES_RUNNER_TOKEN` is a secret token used to authenticate with the KCLI pipelines runner. This token is required to trigger certain pipelines.
 
+### KCLI Pipelines GitHub Token
+
+The `KCLI_PIPELINES_GITHUB_TOKEN` is a GitHub token used to authenticate with the GitHub repository. This token is required to update GitHub secrets and trigger workflows.
+
+The `KCLI_PIPELINES_RUNNER_TOKEN` is a secret token used to authenticate with the KCLI pipelines runner. This token is required to trigger certain pipelines.
+
 ### Command Line Example
 
 When running the script from the command line, include the `--kcli_pipelines_runner_token` argument:
@@ -58,7 +64,8 @@ python trigger-equinix-server-instance.py \
     --freeipa_server_domain FREEIPA_SERVER_DOMAIN \
     --guid GUID \
     --ollama OLLAMA \
-    --kcli_pipelines_runner_token YOUR_KCLI_PIPELINES_RUNNER_TOKEN
+    --kcli_pipelines_runner_token YOUR_KCLI_PIPELINES_RUNNER_TOKEN \
+    --kcli_pipelines_github_token YOUR_KCLI_PIPELINES_GITHUB_TOKEN
 ```
 
 ### GUI Interface
