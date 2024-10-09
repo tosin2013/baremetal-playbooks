@@ -75,7 +75,7 @@ jobs:
           echo 'export NEW_DOMAIN="${{ inputs.NEW_DOMAIN }}"' >> .env
           echo 'export ZONE_NAME="${{ inputs.NEW_DOMAIN }}"' >> .env
           echo 'export NEW_FORWARDER="${{ inputs.NEW_FORWARDER }}"' >> .env
-          echo 'export CICD_ENVIORNMENT="github"' >> .env
+          echo 'export CICD_ENVIRONMENT="github"' >> .env
           echo 'export USE_ROUTE53=true' >> .env
           echo 'export FREEIPA_SERVER_FQDN="ipa.${{ inputs.GUID }}.example.com"' >> .env
           echo 'export FREEIPA_SERVER_DOMAIN="${{ inputs.GUID }}.example.com"' >> .env

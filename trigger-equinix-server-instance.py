@@ -13,27 +13,6 @@ import nacl.public
 import nacl.utils
 import streamlit as st
 
-def init_db():
-    """Initialize the SQLite database."""
-    with closing(sqlite3.connect('defaults.db')) as conn:
-        with closing(conn.cursor()) as cursor:
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS defaults (
-                    id INTEGER PRIMARY KEY,
-                    ssh_password TEXT,
-                    aws_access_key TEXT,
-                    aws_secret_key TEXT,
-                    new_host TEXT,
-                    new_username TEXT,
-                    new_domain TEXT,
-                    new_forwarder TEXT,
-                    freeipa_server_fqdn TEXT,
-                    freeipa_server_domain TEXT,
-                    guid TEXT,
-                    ollama TEXT
-                )
-            ''')
-        conn.commit()
 
 def init_db():
     """Initialize the SQLite database."""
