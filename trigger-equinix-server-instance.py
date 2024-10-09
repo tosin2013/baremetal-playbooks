@@ -146,10 +146,13 @@ def cli_main(args):
     ssh_password = args.ssh_password
     aws_access_key = args.aws_access_key
     aws_secret_key = args.aws_secret_key
+    kcli_pipelines_runner_token = args.kcli_pipelines_runner_token
+    
 
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
     update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+    update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
 
     trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
     print("Pipeline has been triggered successfully.")
@@ -206,7 +209,6 @@ def gui_main():
         update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
         update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
         update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", kcli_pipelines_runner_token, token)
-        update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", args.kcli_pipelines_runner_token, token)
 
         save_defaults((
             ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
