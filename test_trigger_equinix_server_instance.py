@@ -2,9 +2,10 @@ import pytest
 import sqlite3
 import os
 from unittest.mock import patch, MagicMock, call
-update_github_secret,
-cli_main,
-gui_main,
+from trigger_equinix_server_instance import (
+    update_github_secret,
+    cli_main,
+    gui_main,
 )
 
 # Mocking the database connection
