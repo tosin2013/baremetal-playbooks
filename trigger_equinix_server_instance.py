@@ -122,6 +122,7 @@ def cli_main(args):
     repo_name = "baremetal-playbooks"
     workflow_id = "equinix-metal-baremetal-blank-server.yml"
     token = args.kcli_pipelines_github_token
+    runner_token = args.runner_token
 
     inputs = {
         "NEW_HOST": args.new_host,
@@ -141,8 +142,9 @@ def cli_main(args):
     update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
     update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
     update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
+    update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", runner_token, token)
 
-    trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
+    trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs, runner_token)
     print("Pipeline has been triggered successfully.")
 
 
@@ -299,6 +301,9 @@ def main():
         type=str,
         help="GitHub Token for KCLI Pipelines",
         required=True,
+    )
+    parser.add_argument(
+        "--runner_token", type=str, help="Runner Token", required=True
     )
     parser.add_argument("--gui", action="store_true", help="Start the Streamlit GUI")
     args = parser.parse_args()
