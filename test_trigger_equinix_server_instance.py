@@ -32,7 +32,7 @@ def test_init_db(mock_db_connection):
             """CREATE TABLE IF NOT EXISTS defaults (
                 id INTEGER PRIMARY KEY,
                 ssh_password TEXT,
-                aws_access_key CHAR(20),
+                aws_access_key TEXT,
                 aws_secret_key TEXT,
                 new_host TEXT,
                 new_username TEXT,
@@ -103,7 +103,7 @@ def test_save_defaults(mock_db_connection):
         """INSERT INTO defaults (
             ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
             freeipa_server_fqdn, freeipa_server_domain, guid, ollama
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         defaults,
     )
     mock_conn.commit.assert_called_once()
