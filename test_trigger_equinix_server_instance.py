@@ -116,14 +116,14 @@ def test_save_defaults(mock_db_connection):
 @patch("requests.post")
 def test_trigger_github_action(mock_post):
     mock_post.return_value.status_code = 204
-    trigger_github_action("owner", "repo", "workflow", "token", {"input": "value"})
+    trigger_github_action("owner", "repo", "workflow", "token", {"input": "value"}, "runner_token")
     mock_post.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/workflows/workflow/dispatches",
         headers={
             "Authorization": "token token",
             "Accept": "application/vnd.github.v3+json",
         },
-        json={"ref": "main", "inputs": {"input": "value"}},
+        json={"ref": "main", "inputs": {"input": "value", "KCLI_PIPELINES_RUNNER_TOKEN": "runner_token"}},
     )
 
 
