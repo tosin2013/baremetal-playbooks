@@ -42,7 +42,7 @@ def test_init_db(mock_db_connection):
                 freeipa_server_domain TEXT,
                 guid TEXT,
                 ollama TEXT
-            )"""
+        )"""
         )
         mock_conn.commit.assert_called_once()
         mock_conn.close.assert_called_once()
