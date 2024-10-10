@@ -30,18 +30,18 @@ def test_init_db(mock_db_connection):
         init_db()
         mock_cursor.execute.assert_called_once_with(
             """CREATE TABLE IF NOT EXISTS defaults (
-                id INTEGER PRIMARY KEY,
-                ssh_password TEXT,
-                aws_access_key TEXT,
-                aws_secret_key TEXT,
-                new_host TEXT,
-                new_username TEXT,
-                new_domain TEXT,
-                new_forwarder TEXT,
-                freeipa_server_fqdn TEXT,
-                freeipa_server_domain TEXT,
-                guid TEXT,
-                ollama TEXT
+            id INTEGER PRIMARY KEY,
+            ssh_password TEXT,
+            aws_access_key TEXT,
+            aws_secret_key TEXT,
+            new_host TEXT,
+            new_username TEXT,
+            new_domain TEXT,
+            new_forwarder TEXT,
+            freeipa_server_fqdn TEXT,
+            freeipa_server_domain TEXT,
+            guid TEXT,
+            ollama TEXT
         )"""
         )
         mock_conn.commit.assert_called_once()
