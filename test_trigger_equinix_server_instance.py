@@ -138,7 +138,7 @@ def test_update_github_secret(mock_put, mock_get):
     mock_put.return_value.status_code = 204
 
     with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
-        mock_encrypt.return_value = b"fixed_encrypted_value"
+        mock_encrypt.return_value = b"ZmluZWRfZW5jcnlwdGVkX3ZhbHVl"
         update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
 
     mock_get.assert_called_once_with(
@@ -181,6 +181,9 @@ def test_cli_main(mock_trigger, mock_update):
         "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
     )
     mock_update.assert_any_call(
+        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+    )
+    mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
     )
     mock_update.assert_any_call(
@@ -201,7 +204,7 @@ def test_cli_main(mock_trigger, mock_update):
             "GUID": "guid",
             "OLLAMA": "ollama",
         },
-        "runner_token"
+        args.runner_token
     )
 
 
