@@ -154,6 +154,14 @@ def test_update_github_secret(mock_put, mock_get):
     sealed_box = nacl.public.SealedBox(public_key)
     encrypted = sealed_box.encrypt("secret_value".encode())
     encrypted_value = nacl.encoding.Base64Encoder.encode(encrypted).decode()
+    mock_put.assert_called_once_with(
+        "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
+        headers={
+            "Authorization": "token token",
+            "Accept": "application/vnd.github.v3+json",
+        },
+        json={"encrypted_value": encrypted_value, "key_id": "key_id"},
+    )
 
     mock_put.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
@@ -258,6 +266,18 @@ def test_gui_main(
             "ollama",
         )
         gui_main()
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+        )
     mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
     )
