@@ -61,7 +61,7 @@ def save_defaults(defaults):
         conn.commit()
 
 
-def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
+def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs, kcli_pipelines_runner_token):
     """Trigger a GitHub action with the provided inputs."""
     url = (
         f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
@@ -71,6 +71,7 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
     }
+    inputs["KCLI_PIPELINES_RUNNER_TOKEN"] = kcli_pipelines_runner_token
     data = {"ref": "main", "inputs": inputs}
     response = requests.post(url, headers=headers, json=data)
     if response.status_code == 204:
@@ -238,7 +239,7 @@ def gui_main():
             )
         )
 
-        trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs)
+        trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs, kcli_pipelines_runner_token)
         st.success("Pipeline has been triggered successfully.")
 
     # Add the "Save Variables" button
