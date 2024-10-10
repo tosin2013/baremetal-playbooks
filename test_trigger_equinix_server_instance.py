@@ -278,6 +278,9 @@ def test_gui_main(
         mock_update.assert_any_call(
             "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
         )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+        )
     mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
     )
