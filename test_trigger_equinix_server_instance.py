@@ -151,16 +151,18 @@ def test_update_github_secret(mock_put, mock_get):
         mock_get.return_value.json.return_value["key"].encode(),
         encoder=nacl.encoding.Base64Encoder
     )
-    sealed_box = nacl.public.SealedBox(public_key)
-    encrypted = sealed_box.encrypt("secret_value".encode())
-    encrypted_value = nacl.encoding.Base64Encoder.encode(encrypted).decode()
+    with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
+        mock_encrypt.return_value = b"fixed_encrypted_value"
+        sealed_box = nacl.public.SealedBox(public_key)
+        encrypted = sealed_box.encrypt("secret_value".encode())
+        encrypted_value = nacl.encoding.Base64Encoder.encode(encrypted).decode()
     mock_put.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
         headers={
             "Authorization": "token token",
             "Accept": "application/vnd.github.v3+json",
         },
-        json={"encrypted_value": encrypted_value, "key_id": "key_id"},
+        json={"encrypted_value": "ZmluZWRfZW5jcnlwdGVkX3ZhbHVl", "key_id": "key_id"},
     )
 
     mock_put.assert_called_once_with(
