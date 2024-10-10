@@ -201,6 +201,9 @@ def test_cli_main(mock_trigger, mock_update):
     mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
     )
+    mock_update.assert_any_call(
+        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+    )
     mock_trigger.assert_called_once_with(
         "tosin2013",
         "baremetal-playbooks",
