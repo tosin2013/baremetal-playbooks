@@ -203,13 +203,17 @@ def gui_main():
             "OLLAMA": ollama,
         }
 
+        print(f"Updating SSH_PASSWORD: {ssh_password}")  # Add this line for debugging
         update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
+        print(f"Updating AWS_ACCESS_KEY: {aws_access_key}")  # Add this line for debugging
         update_github_secret(
             repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token
         )
+        print(f"Updating AWS_SECRET_KEY: {aws_secret_key}")  # Add this line for debugging
         update_github_secret(
             repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token
         )
+        print(f"Updating KCLI_PIPELINES_RUNNER_TOKEN: {kcli_pipelines_runner_token}")  # Add this line for debugging
         update_github_secret(
             repo_owner,
             repo_name,
