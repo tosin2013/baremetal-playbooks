@@ -130,11 +130,11 @@ def test_trigger_github_action(mock_post):
 @patch("requests.put")
 def test_update_github_secret(mock_put, mock_get):
     mock_get.return_value.json.return_value = {
-        "key": "a" * 32,  # This is a valid 32-byte key
+        "key": "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=",  # This is a valid Public Key
         "key_id": "key_id",
     }
     # Ensure the key is correctly formatted before passing it to the `nacl.public.PublicKey` constructor
-    mock_get.return_value.json.return_value["key"] = "a" * 32
+    mock_get.return_value.json.return_value["key"] = "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU="
     mock_put.return_value.status_code = 204
     update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
     mock_get.assert_called_once_with(

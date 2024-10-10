@@ -51,12 +51,10 @@ def save_defaults(defaults):
     with closing(sqlite3.connect("defaults.db")) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute(
-                """
-                INSERT INTO defaults (
+                """INSERT INTO defaults (
                     ssh_password, aws_access_key, aws_secret_key, new_host, new_username, new_domain, new_forwarder,
                     freeipa_server_fqdn, freeipa_server_domain, guid, ollama
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 defaults,
             )
         conn.commit()
