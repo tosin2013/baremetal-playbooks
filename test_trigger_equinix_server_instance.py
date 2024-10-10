@@ -2,6 +2,8 @@ import pytest
 import sqlite3
 import os
 from unittest.mock import patch, MagicMock, call
+import nacl.public
+import nacl.encoding
 from trigger_equinix_server_instance import (
     update_github_secret,
     cli_main,
