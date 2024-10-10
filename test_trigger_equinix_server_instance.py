@@ -163,6 +163,9 @@ def test_update_github_secret(mock_put, mock_get):
     runner_token = "runner_token"
     inputs = {"input": "value", "KCLI_PIPELINES_RUNNER_TOKEN": runner_token}
     trigger_github_action("owner", "repo", "workflow", "token", inputs, runner_token)
+    runner_token = "runner_token"
+    inputs = {"input": "value", "KCLI_PIPELINES_RUNNER_TOKEN": runner_token}
+    trigger_github_action("owner", "repo", "workflow", "token", inputs, runner_token)
     mock_put.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
         headers={
@@ -206,6 +209,43 @@ def test_cli_main(mock_trigger, mock_update):
     )
     mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+    )
+    mock_trigger.assert_called_once_with(
+        "tosin2013",
+        "baremetal-playbooks",
+        "equinix-metal-baremetal-blank-server.yml",
+        "token",
+        {
+            "NEW_HOST": "host",
+            "NEW_USERNAME": "username",
+            "NEW_DOMAIN": "domain",
+            "NEW_FORWARDER": "forwarder",
+            "FREEIPA_SERVER_FQDN": "fqdn",
+            "FREEIPA_SERVER_DOMAIN": "domain",
+            "GUID": "guid",
+            "OLLAMA": "ollama",
+        },
+        "runner_token"
+    )
+    mock_update.assert_any_call(
+        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+    )
+    mock_trigger.assert_called_once_with(
+        "tosin2013",
+        "baremetal-playbooks",
+        "equinix-metal-baremetal-blank-server.yml",
+        "token",
+        {
+            "NEW_HOST": "host",
+            "NEW_USERNAME": "username",
+            "NEW_DOMAIN": "domain",
+            "NEW_FORWARDER": "forwarder",
+            "FREEIPA_SERVER_FQDN": "fqdn",
+            "FREEIPA_SERVER_DOMAIN": "domain",
+            "GUID": "guid",
+            "OLLAMA": "ollama",
+        },
+        "runner_token"
     )
     mock_trigger.assert_called_once_with(
         "tosin2013",
