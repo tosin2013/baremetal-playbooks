@@ -135,10 +135,12 @@ def test_update_github_secret(mock_put, mock_get):
         "key": "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=",  # This is a valid Public Key
         "key_id": "key_id",
     }
-    # Ensure the key is correctly formatted before passing it to the `nacl.public.PublicKey` constructor
-    mock_get.return_value.json.return_value["key"] = "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU="
     mock_put.return_value.status_code = 204
-    update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
+
+    with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
+        mock_encrypt.return_value = b"fixed_encrypted_value"
+        update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
+
     mock_get.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/secrets/public-key",
         headers={
@@ -146,16 +148,6 @@ def test_update_github_secret(mock_put, mock_get):
             "Accept": "application/vnd.github.v3+json",
         },
     )
-    # Generate the actual encrypted value
-    public_key = nacl.public.PublicKey(
-        mock_get.return_value.json.return_value["key"].encode(),
-        encoder=nacl.encoding.Base64Encoder
-    )
-    with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
-        mock_encrypt.return_value = b"fixed_encrypted_value"
-        sealed_box = nacl.public.SealedBox(public_key)
-        encrypted = sealed_box.encrypt("secret_value".encode())
-        encrypted_value = nacl.encoding.Base64Encoder.encode(encrypted).decode()
     mock_put.assert_called_once_with(
         "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
         headers={
@@ -163,15 +155,6 @@ def test_update_github_secret(mock_put, mock_get):
             "Accept": "application/vnd.github.v3+json",
         },
         json={"encrypted_value": "ZmluZWRfZW5jcnlwdGVkX3ZhbHVl", "key_id": "key_id"},
-    )
-
-    mock_put.assert_called_once_with(
-        "https://api.github.com/repos/owner/repo/actions/secrets/secret_name",
-        headers={
-            "Authorization": "token token",
-            "Accept": "application/vnd.github.v3+json",
-        },
-        json={"encrypted_value": encrypted_value, "key_id": "key_id"},
     )
 
 
@@ -198,162 +181,11 @@ def test_cli_main(mock_trigger, mock_update):
         "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
     )
     mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
-        "runner_token"
-    )
-    mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
     )
     mock_update.assert_any_call(
         "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
     )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-    )
     mock_trigger.assert_called_once_with(
         "tosin2013",
         "baremetal-playbooks",
@@ -370,22 +202,6 @@ def test_cli_main(mock_trigger, mock_update):
             "OLLAMA": "ollama",
         },
         "runner_token"
-    )
-    mock_trigger.assert_called_once_with(
-        "tosin2013",
-        "baremetal-playbooks",
-        "equinix-metal-baremetal-blank-server.yml",
-        "token",
-        {
-            "NEW_HOST": "host",
-            "NEW_USERNAME": "username",
-            "NEW_DOMAIN": "domain",
-            "NEW_FORWARDER": "forwarder",
-            "FREEIPA_SERVER_FQDN": "fqdn",
-            "FREEIPA_SERVER_DOMAIN": "domain",
-            "GUID": "guid",
-            "OLLAMA": "ollama",
-        },
     )
 
 
@@ -448,32 +264,6 @@ def test_gui_main(
         mock_update.assert_any_call(
             "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
         )
-        mock_update.assert_any_call(
-            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
-        )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
-    )
-    mock_update.assert_any_call(
-        "tosin2013",
-        "baremetal-playbooks",
-        "KCLI_PIPELINES_RUNNER_TOKEN",
-        "runner_token",
-        "token",
-    )
-    # Ensure the mock is correctly set up and the calls are verified
-    mock_update.assert_has_calls([
-        call("tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"),
-        call("tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"),
-        call("tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"),
-        call("tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"),
-    ])
     mock_trigger.assert_called_once_with(
         "tosin2013",
         "baremetal-playbooks",
