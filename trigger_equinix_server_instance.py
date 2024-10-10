@@ -48,6 +48,7 @@ def get_defaults():
 
 def save_defaults(defaults):
     """Save the provided defaults to the database."""
+    print(f"Saving defaults: {defaults}")  # Add this line for debugging
     with closing(sqlite3.connect("defaults.db")) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute(
