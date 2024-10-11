@@ -213,7 +213,7 @@ def test_cli_main(mock_trigger, mock_update):
             "GUID": "guid",
             "OLLAMA": "ollama",
         },
-        args.runner_token
+        "runner_token"
     )
 
 
