@@ -282,7 +282,7 @@ def test_gui_main(
             "guid",
             "ollama",
         )
-        gui_main()
+        gui_main(args.runner_token)
         mock_update.assert_any_call(
             "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
         )
