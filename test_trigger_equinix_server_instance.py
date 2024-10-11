@@ -241,6 +241,7 @@ def test_gui_main(
         "domain",
         "guid",
         "ollama",
+        "runner_token",  # Ensure runner_token is set
     ]
     mock_button.side_effect = [False, True]
 

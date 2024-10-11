@@ -192,7 +192,7 @@ def gui_main():
         kcli_pipelines_runner_token = st.text_input(
             "KCLI Pipelines Runner Token",
             type="password",
-            value=os.getenv("KCLI_PIPELINES_RUNNER_TOKEN", ""),
+            value=os.getenv("KCLI_PIPELINES_RUNNER_TOKEN", "runner_token"),
         )
 
         inputs = {
