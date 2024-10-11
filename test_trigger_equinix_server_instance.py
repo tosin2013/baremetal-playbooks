@@ -138,7 +138,7 @@ def test_update_github_secret(mock_put, mock_get):
     mock_put.return_value.status_code = 204
 
     with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
-        mock_encrypt.return_value = b"ZmluZWRfZW5jcnlwdGVkX3ZhbHVl"
+        mock_encrypt.return_value = b"Wm1sdVpXUmZaVzVqY25sd2RHVmtYM1poYkhWbA=="
         update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
 
     mock_get.assert_called_once_with(
