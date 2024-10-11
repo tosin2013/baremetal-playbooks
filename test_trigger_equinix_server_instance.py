@@ -243,6 +243,9 @@ def test_gui_main(
     ]
     mock_button.side_effect = [False, True]
 
+    # Mock the args object
+    args = MagicMock(runner_token="runner_token")
+
     # Ensure the table is created before accessing it
     with patch("sqlite3.connect") as mock_connect:
         mock_conn = MagicMock()
