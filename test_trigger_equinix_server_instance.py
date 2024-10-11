@@ -247,6 +247,20 @@ def test_gui_main(
 
     # Mock the args object
     args = MagicMock(runner_token="runner_token")
+    mock_text_input.side_effect = [
+        "password",
+        "access_key",
+        "secret_key",
+        "host",
+        "username",
+        "domain",
+        "forwarder",
+        "fqdn",
+        "domain",
+        "guid",
+        "ollama",
+        "runner_token",  # Ensure runner_token is set
+    ]
 
     # Ensure the table is created before accessing it
     with patch("sqlite3.connect") as mock_connect:

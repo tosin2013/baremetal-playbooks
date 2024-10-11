@@ -194,6 +194,8 @@ def gui_main():
             type="password",
             value=os.getenv("KCLI_PIPELINES_RUNNER_TOKEN", "runner_token"),
         )
+        if kcli_pipelines_runner_token == "runner_token":
+            kcli_pipelines_runner_token = args.runner_token
 
         inputs = {
             "NEW_HOST": new_host,
