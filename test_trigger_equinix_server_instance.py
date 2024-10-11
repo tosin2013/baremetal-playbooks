@@ -184,6 +184,7 @@ def test_cli_main(mock_trigger, mock_update):
         freeipa_server_domain="domain",
         guid="guid",
         ollama="ollama",
+        runner_token="runner_token",  # Ensure runner_token is set
     )
     cli_main(args)
     mock_update.assert_any_call(
