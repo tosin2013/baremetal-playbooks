@@ -138,7 +138,7 @@ def test_update_github_secret(mock_put, mock_get):
     mock_put.return_value.status_code = 204
 
     with patch("nacl.public.SealedBox.encrypt") as mock_encrypt:
-        mock_encrypt.return_value = b"Wm1sdVpXUmZaVzVqY25sd2RHVmtYM1poYkhWbA=="
+        mock_encrypt.return_value = nacl.encoding.Base64Encoder.encode(nacl.public.SealedBox(nacl.public.PublicKey(b"KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=", encoder=nacl.encoding.Base64Encoder)).encrypt(b"secret_value"))
         update_github_secret("owner", "repo", "secret_name", "secret_value", "token")
 
     mock_get.assert_called_once_with(
@@ -154,7 +154,7 @@ def test_update_github_secret(mock_put, mock_get):
             "Authorization": "token token",
             "Accept": "application/vnd.github.v3+json",
         },
-        json={"encrypted_value": "Wm1sdVpXUmZaVzVqY25sd2RHVmtYM1poYkhWbA==", "key_id": "key_id"},
+        json={"encrypted_value": nacl.encoding.Base64Encoder.encode(nacl.public.SealedBox(nacl.public.PublicKey(b"KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=", encoder=nacl.encoding.Base64Encoder)).encrypt(b"secret_value")).decode(), "key_id": "key_id"},
     )
 
 
