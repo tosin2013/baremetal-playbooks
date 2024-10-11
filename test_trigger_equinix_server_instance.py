@@ -261,6 +261,20 @@ def test_gui_main(
         "ollama",
         "runner_token",  # Ensure runner_token is set
     ]
+    mock_text_input.side_effect = [
+        "password",
+        "access_key",
+        "secret_key",
+        "host",
+        "username",
+        "domain",
+        "forwarder",
+        "fqdn",
+        "domain",
+        "guid",
+        "ollama",
+        "runner_token",  # Ensure runner_token is set
+    ]
 
     # Ensure the table is created before accessing it
     with patch("sqlite3.connect") as mock_connect:
@@ -283,6 +297,18 @@ def test_gui_main(
             "ollama",
         )
         gui_main(args.runner_token)
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+        )
         mock_update.assert_any_call(
             "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
         )
