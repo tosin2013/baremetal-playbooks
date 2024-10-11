@@ -148,7 +148,7 @@ def cli_main(args):
     print("Pipeline has been triggered successfully.")
 
 
-def gui_main():
+def gui_main(runner_token):
     """Main function for GUI execution using Streamlit."""
     st.title("Equinix Metal Server Instance Trigger")
 
@@ -195,7 +195,7 @@ def gui_main():
             value=os.getenv("KCLI_PIPELINES_RUNNER_TOKEN", "runner_token"),
         )
         if kcli_pipelines_runner_token == "runner_token":
-            kcli_pipelines_runner_token = args.runner_token
+            kcli_pipelines_runner_token = runner_token
 
         inputs = {
             "NEW_HOST": new_host,
@@ -311,7 +311,7 @@ def main():
     args = parser.parse_args()
 
     if args.gui:
-        gui_main()
+        gui_main(args.runner_token)
     else:
         cli_main(args)
 
