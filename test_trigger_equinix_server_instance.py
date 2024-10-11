@@ -274,7 +274,7 @@ def test_gui_main(
             "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
         )
         mock_update.assert_any_call(
-            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", args.runner_token, "token"
         )
     mock_trigger.assert_called_once_with(
         "tosin2013",
