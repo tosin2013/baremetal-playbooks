@@ -322,6 +322,18 @@ def test_gui_main(
             "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
         )
         mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "SSH_PASSWORD", "password", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "AWS_SECRET_KEY", "secret_key", "token"
+        )
+        mock_update.assert_any_call(
+            "tosin2013", "baremetal-playbooks", "KCLI_PIPELINES_RUNNER_TOKEN", "runner_token", "token"
+        )
+        mock_update.assert_any_call(
             "tosin2013", "baremetal-playbooks", "AWS_ACCESS_KEY", "access_key", "token"
         )
         mock_update.assert_any_call(
