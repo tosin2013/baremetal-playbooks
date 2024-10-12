@@ -140,14 +140,14 @@ def test_update_github_secret(mock_get, mock_put):
         mock_encrypt.assert_called_once_with(b"secret_value")
 
     mock_get.assert_called_once_with(
-        f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/secrets/public-key",
+        "https://api.github.com/repos/{}/{}/actions/secrets/public-key".format(REPO_OWNER, REPO_NAME),
         headers={
             "Authorization": "token token",
             "Accept": "application/vnd.github.v3+json",
         },
     )
     mock_put.assert_called_once_with(
-        f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/secrets/secret_name",
+        "https://api.github.com/repos/{}/{}/actions/secrets/secret_name".format(REPO_OWNER, REPO_NAME),
         headers={
             "Authorization": "token token",
             "Accept": "application/vnd.github.v3+json",
@@ -237,8 +237,6 @@ def test_gui_main(
     mock_success,
     mock_update,
     mock_trigger,
-    type='text',
-    value='',
 ):
     """Test the gui_main function to ensure it updates secrets and triggers the pipeline via GUI."""
     # Define the expected sequence of inputs based on labels
@@ -257,7 +255,7 @@ def test_gui_main(
         "KCLI Pipelines Runner Token": "runner_token",
     }
 
-    def text_input_side_effect(label, type='text', value=''):
+    def text_input_side_effect(label):
         return input_mapping.get(label, "")
 
     mock_text_input.side_effect = text_input_side_effect
