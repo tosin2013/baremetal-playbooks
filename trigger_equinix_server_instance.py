@@ -46,17 +46,17 @@ def get_defaults():
             row = cursor.fetchone()
             if row:
                 return {
-                    "ssh_password": row[1],
-                    "aws_access_key": row[2],
-                    "aws_secret_key": row[3],
-                    "new_host": row[4],
-                    "new_username": row[5],
-                    "new_domain": row[6],
-                    "new_forwarder": row[7],
-                    "freeipa_server_fqdn": row[8],
-                    "freeipa_server_domain": row[9],
-                    "guid": row[10],
-                    "ollama": row[11],
+                    "ssh_password": row[1] if row[1] else "",
+                    "aws_access_key": row[2] if row[2] else "",
+                    "aws_secret_key": row[3] if row[3] else "",
+                    "new_host": row[4] if row[4] else "",
+                    "new_username": row[5] if row[5] else "",
+                    "new_domain": row[6] if row[6] else "",
+                    "new_forwarder": row[7] if row[7] else "",
+                    "freeipa_server_fqdn": row[8] if row[8] else "",
+                    "freeipa_server_domain": row[9] if row[9] else "",
+                    "guid": row[10] if row[10] else "",
+                    "ollama": row[11] if row[11] else "",
                 }
             return {}
 
