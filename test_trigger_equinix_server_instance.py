@@ -1,6 +1,12 @@
 """Unit tests for the trigger_equinix_server_instance module."""
 
 
+import warnings
+import logging
+from unittest.mock import patch, MagicMock, call, mock_open
+import yaml
+import nacl.public
+import nacl.encoding
 from trigger_equinix_server_instance import (
     update_github_secret,
     cli_main,
