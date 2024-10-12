@@ -45,6 +45,7 @@ def get_defaults():
             cursor.execute("SELECT * FROM defaults ORDER BY id DESC LIMIT 1")
             row = cursor.fetchone()
             if row:
+                print(f"Retrieved row from database: {row}")  # Add this line for debugging
                 return {
                     "ssh_password": row[1] if row[1] else "",
                     "aws_access_key": row[2] if row[2] else "",
