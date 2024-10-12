@@ -309,3 +309,71 @@ def test_gui_main(
         "runner_token",
     )
     mock_success.assert_called_once_with("Pipeline has been triggered successfully.")
+# Ensure imports are correct and libraries are installed
+import warnings
+import logging
+from unittest.mock import patch, MagicMock, call, mock_open
+import yaml
+import nacl.public
+import nacl.encoding
+from trigger_equinix_server_instance import (
+    update_github_secret,
+    cli_main,
+    gui_main,
+    get_defaults,
+    save_defaults,
+    trigger_github_action,
+)
+
+# Constants for repeated values
+REPO_OWNER = "tosin2013"
+REPO_NAME = "baremetal-playbooks"
+WORKFLOW_FILE = "equinix-metal-baremetal-blank-server.yml"
+CONFIG_FILE = 'config.yaml'
+
+# Suppress specific Streamlit warnings
+warnings.filterwarnings("ignore", message=".*missing ScriptRunContext!*")
+logging.getLogger("streamlit").setLevel(logging.ERROR)
+
+# Example of fixing line length and string formatting
+@patch("trigger_equinix_server_instance.requests.put")
+@patch("trigger_equinix_server_instance.requests.get")
+def test_update_github_secret(mock_get, mock_put):
+    """Test the update_github_secret function to ensure it updates a GitHub secret."""
+    mock_get.return_value.json.return_value = {
+        "key": "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=",
+        "key_id": "key_id",
+    }
+    mock_put.return_value.status_code = 204
+
+    # Correctly encrypt the secret value
+    public_key = nacl.public.PublicKey(
+        "KFf6jhg+E7PrUX5WTRJvv0WVAih1dK+tQwF+E/bfIBU=",
+        encoder=nacl.encoding.Base64Encoder,
+    )
+    sealed_box = nacl.public.SealedBox(public_key)
+    encrypted_value = sealed_box.encrypt(b"secret_value")
+    encoded_encrypted_value = nacl.encoding.Base64Encoder.encode(encrypted_value).decode()
+
+    with patch.object(nacl.public.SealedBox, "encrypt", return_value=encrypted_value) as mock_encrypt:
+        update_github_secret(REPO_OWNER, REPO_NAME, "secret_name", "secret_value", "token")
+        mock_encrypt.assert_called_once_with(b"secret_value")
+
+    mock_get.assert_called_once_with(
+        f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/secrets/public-key",
+        headers={
+            "Authorization": "token token",
+            "Accept": "application/vnd.github.v3+json",
+        },
+    )
+    mock_put.assert_called_once_with(
+        f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/secrets/secret_name",
+        headers={
+            "Authorization": "token token",
+            "Accept": "application/vnd.github.v3+json",
+        },
+        json={
+            "encrypted_value": encoded_encrypted_value,
+            "key_id": "key_id",
+        },
+    )

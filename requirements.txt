@@ -1,2 +1,5 @@
 PyNaCl
 streamlit
+pytest
+pyyaml
+pynacl
