@@ -43,7 +43,22 @@ def get_defaults():
     with closing(sqlite3.connect("defaults.db")) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute("SELECT * FROM defaults ORDER BY id DESC LIMIT 1")
-            return cursor.fetchone()
+            row = cursor.fetchone()
+            if row:
+                return {
+                    "ssh_password": row[1],
+                    "aws_access_key": row[2],
+                    "aws_secret_key": row[3],
+                    "new_host": row[4],
+                    "new_username": row[5],
+                    "new_domain": row[6],
+                    "new_forwarder": row[7],
+                    "freeipa_server_fqdn": row[8],
+                    "freeipa_server_domain": row[9],
+                    "guid": row[10],
+                    "ollama": row[11],
+                }
+            return {}
 
 
 def save_defaults(defaults):
