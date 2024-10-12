@@ -2,7 +2,6 @@
 
 import unittest
 from unittest.mock import patch, MagicMock, call, mock_open
-import pytest
 import yaml
 import os
 import warnings
@@ -235,11 +234,11 @@ def test_cli_main(mock_update, mock_trigger):
 @patch("streamlit.text_input")
 def test_gui_main(
     mock_text_input,
-    mock_button,
     mock_success,
-    mock_getenv,
     mock_update,
     mock_trigger,
+    type='text',
+    value='',
 ):
     """Test the gui_main function to ensure it updates secrets and triggers the pipeline via GUI."""
     # Define the expected sequence of inputs based on labels
