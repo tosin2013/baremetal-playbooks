@@ -437,7 +437,7 @@ for arg in "$@"; do
         run_ansible_playbook "playbooks/push-ssh-key.yaml" "$SECRETS_FILE" ""
         ;;
         --push-pipeline-vars)
-        debug_pipeline_vars
+       #debug_pipeline_vars
         ansible-playbook -i "$ORIGINAL_HOSTS_FILE" playbooks/push-pipeline-variables.yaml -e "variables_file=$PIPELINES_VARS"
         ;;
         --trigger-github-pipelines)
