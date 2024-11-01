@@ -16,12 +16,51 @@
 set -euo pipefail
 
 # Function to log messages
+#
+# This function logs a message with a timestamp. The timestamp is formatted as 
+# 'YYYY-MM-DD HH:MM:SS' and is prefixed to the message. The message is then 
+# printed to the standard output.
+#
+# Usage:
+#   log_message "Your message here"
+#
+# Parameters:
+#   $1 - The message to be logged.
+#
+# Example:
+#   log_message "Starting the bootstrap process"
+#
+# Output:
+#   [2023-10-01 12:34:56] Starting the bootstrap process
 log_message() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# Function to display usage information
+
 function usage {
+    # Display usage information for the script
+    #
+    # This function prints the usage information for the script, including available options
+    # and examples of how to use them. It also exits the script with a status code of 1.
+    #
+    # Usage:
+    #   usage
+    #
+    # Examples:
+    #   End-to-End Setup:
+    #     $0 --push-ssh-key --push-pipeline-vars --trigger-github-pipelines
+    #   Download Images:
+    #     $0 --copy-image
+    #   Copy Files:
+    #     $0 --copy-files
+    #   Configure FreeIPA Server:
+    #     $0 --ipa-server
+    #   Configure OCP AI Service:
+    #     $0 --ocp-ai-svc
+    #   Load Environment Variables from Vault:
+    #     $0 --load-from-vault
+    #   Debug Pipeline Variables:
+    #     $0 --debug-pipeline-vars
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
     echo "  --push-ssh-key             Push SSH keys to the target servers."
@@ -53,10 +92,40 @@ function usage {
     exit 1
 }
 
-# Function to load environment variables
-# Function to load environment variables
+
 function load_env_vars {
   # Load environment variables from HCP Vault
+  #
+  # This function loads environment variables from either HCP Vault or a local .env file.
+  # If the `--load-from-vault` flag is provided, it retrieves the necessary variables from
+  # HCP Vault using the HCP CLI. If the flag is not provided, it loads variables from a
+  # local .env file.
+  #
+  # Usage:
+  #   load_env_vars [--load-from-vault]
+  #
+  # Parameters:
+  #   --load-from-vault - Optional flag to load variables from HCP Vault.
+  #
+  # Environment Variables:
+  #   HCP_CLIENT_ID - The client ID for authenticating with HCP Vault.
+  #   HCP_CLIENT_SECRET - The client secret for authenticating with HCP Vault.
+  #   HCP_ORG_ID - The organization ID in HCP Vault.
+  #   HCP_PROJECT_ID - The project ID in HCP Vault.
+  #   APP_NAME - The application name in HCP Vault.
+  #   SSH_PUBLIC_KEY - The SSH public key.
+  #   SSH_PRIVATE_KEY - The SSH private key.
+  #   GITHUB_TOKEN - The GitHub token.
+  #   KCLI_PIPELINES_GITHUB_TOKEN - The GitHub token for KCLI pipelines.
+  #   OCP_AI_SVC_PIPELINES_GITHUB_TOKEN - The GitHub token for OCP AI service pipelines.
+  #
+  # Example:
+  #   load_env_vars --load-from-vault
+  #   load_env_vars
+  #
+  # Output:
+  #   The function will export the retrieved or loaded environment variables and
+  #   configure Ansible Vault if the variables are successfully loaded.
   if [ "$1" == "--load-from-vault" ]; then
     if command -v hcp &> /dev/null; then
       echo "Loading environment variables from HCP Vault..."
