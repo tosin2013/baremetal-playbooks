@@ -17,8 +17,8 @@ set -euo pipefail
 
 # Function to log messages
 #
-# This function logs a message with a timestamp. The timestamp is formatted as 
-# 'YYYY-MM-DD HH:MM:SS' and is prefixed to the message. The message is then 
+# This function logs a message with a timestamp. The timestamp is formatted as
+# 'YYYY-MM-DD HH:MM:SS' and is prefixed to the message. The message is then
 # printed to the standard output.
 #
 # Usage:
@@ -197,6 +197,40 @@ function load_env_vars {
   fi
 }
 
+# Function to configure Ansible Vault
+#
+# This function sets up Ansible Vault by downloading and configuring the `ansiblesafe` tool,
+# which is used to manage encrypted Ansible Vault files. It also downloads and sets up
+# the `ansible_vault_setup.sh` script, which is used to initialize the Ansible Vault
+# configuration. The function exports necessary environment variables for HCP Vault
+# and uses `ansiblesafe` to decrypt the `pipeline-variables.yaml` file.
+#
+# Usage:
+#   configure_ansible_vault
+#
+# Steps:
+#   1. Checks if `ansiblesafe` is installed. If not, downloads and extracts it.
+#   2. Moves `ansiblesafe` to either `/usr/local/bin` or `~/.bin` depending on permissions.
+#   3. Downloads the `ansible_vault_setup.sh` script if it is not already present.
+#   4. Exports required environment variables for HCP Vault.
+#   5. Uses `ansiblesafe` to decrypt the `pipeline-variables.yaml` file.
+#   6. Displays the decrypted content of `pipeline-variables.yaml`.
+#
+# Environment Variables:
+#   HCP_CLIENT_ID - The client ID for authenticating with HCP Vault.
+#   HCP_CLIENT_SECRET - The client secret for authenticating with HCP Vault.
+#   HCP_ORG_ID - The organization ID in HCP Vault.
+#   HCP_PROJECT_ID - The project ID in HCP Vault.
+#   APP_NAME - The application name in HCP Vault.
+#   SSH_PASSWORD - The SSH password used for Ansible Vault.
+#
+# Example:
+#   configure_ansible_vault
+#
+# Output:
+#   The function will download and configure `ansiblesafe`, set up the Ansible Vault
+#   environment, and decrypt the `pipeline-variables.yaml` file. It will also display
+#   the decrypted content of the file.
 configure_ansible_vault() {
     log_message "Configuring Ansible Vault..."
 
@@ -205,17 +239,17 @@ configure_ansible_vault() {
 
     if ! command -v ansiblesafe &>/dev/null; then
         log_message "Downloading ansiblesafe..."
-        
+
         if ! curl -OL "$ansiblesafe_url"; then
             log_message "Failed to download ansiblesafe"
             exit 1
         fi
-        
+
         if ! tar -zxvf "ansiblesafe-v0.0.14-linux-amd64.tar.gz"; then
             log_message "Failed to extract ansiblesafe"
             exit 1
         fi
-        
+
         chmod +x ansiblesafe-linux-amd64
 
         # Check if /usr/local/bin is writable and accessible
@@ -271,7 +305,35 @@ configure_ansible_vault() {
     cat vars/pipeline-variables.yaml
 }
 
+
 # Function to check required environment variables
+#
+# This function verifies that all required environment variables are set. If any
+# of the required variables are missing, it logs an error message and exits the
+# script with a status code of 1.
+#
+# Usage:
+#   check_env_vars
+#
+# Required Environment Variables:
+#   SSH_PUBLIC_KEY - The SSH public key.
+#   SSH_PRIVATE_KEY - The SSH private key.
+#   GITHUB_TOKEN - The GitHub token.
+#   KCLI_PIPELINES_GITHUB_TOKEN - The GitHub token for KCLI pipelines.
+#   OCP_AI_SVC_PIPELINES_GITHUB_TOKEN - The GitHub token for OCP AI service pipelines.
+#   GUID - The GUID (Globally Unique Identifier).
+#   OLLAMA - The OLLAMA configuration.
+#   AWS_ACCESS_KEY - The AWS access key.
+#   AWS_SECRET_KEY - The AWS secret key.
+#   KCLI_PIPELINES_RUNNER_TOKEN - The KCLI pipelines runner token.
+#
+# Example:
+#   check_env_vars
+#
+# Output:
+#   If all required environment variables are set, the function will continue
+#   without any output. If any variable is missing, it will log an error message
+#   and exit the script with a status code of 1.
 function check_env_vars {
   required_vars=(
     SSH_PUBLIC_KEY
@@ -294,8 +356,28 @@ function check_env_vars {
   done
 }
 
-# Function to reformat SSH private key
+
 function reformat_key {
+  # Reformat an SSH private key to a standard PEM format
+  #
+  # This function takes an SSH private key in OpenSSH format and reformats it to a standard
+  # PEM format. The reformatted key is saved to a specified file. The function removes any
+  # existing file with the same name before writing the new key.
+  #
+  # Usage:
+  #   reformat_key <key_content> <key_file>
+  #
+  # Parameters:
+  #   key - The SSH private key content in OpenSSH format.
+  #   key_file - The file path where the reformatted key will be saved.
+  #
+  # Example:
+  #   reformat_key "$SSH_PRIVATE_KEY" "formatted_private_key.pem"
+  #
+  # Output:
+  #   The function will save the reformatted key to the specified file and display the
+  #   reformatted key content.
+
   local key="$1"
   local key_file="$2"
 
