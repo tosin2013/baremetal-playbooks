@@ -673,7 +673,7 @@ cat "$GITHUB_ACTIONS_VARS_FILE"
 # - .json_body.inputs.hostname: Set to the value of the NEW_HOST environment variable.
 # Use yq to update freeipa-vars.yml
 echo "Updating freeipa-vars.yml..."
-${YQ_COMMAND} e -i ".github_token = \"$KCLI_PIPELINES_GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
+${YQ_COMMAND} e -i ".github_token = \"$GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_fqdn = \"$FREEIPA_SERVER_FQDN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_domain = \"$FREEIPA_SERVER_DOMAIN\"" "$FREEIPA_VARS_FILE"
 ${YQ_COMMAND} e -i ".freeipa_server_admin_password = \"$FREEIPA_SERVER_ADMIN_PASSWORD\"" "$FREEIPA_VARS_FILE"
