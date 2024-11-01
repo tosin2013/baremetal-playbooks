@@ -486,6 +486,20 @@ function copy_dir_files {
   echo "Files copied to $TARGET_HOST:$TARGET_DIR successfully."
 }
 
+# This function runs an Ansible playbook with specified variables and extra arguments.
+# 
+# Arguments:
+#   playbook (string): The path to the Ansible playbook to be executed.
+#   vars_file (string): The path to the YAML file containing variables for the playbook.
+#   extra_vars (string): Additional variables to pass to the playbook.
+#
+# Usage:
+#   run_ansible_playbook <playbook> <vars_file> <extra_vars>
+#
+# Example:
+#   run_ansible_playbook "site.yml" "vars.yml" "-e some_var=value"
+#
+# If the playbook execution fails, an error message is printed and the script exits with status 1.
 function run_ansible_playbook {
   local playbook="$1"
   local vars_file="$2"
