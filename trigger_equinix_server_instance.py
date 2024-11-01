@@ -15,7 +15,11 @@ import streamlit as st
 
 
 def init_db():
-    """Initialize the SQLite database."""
+    """
+    Initialize the SQLite database.
+
+    This function creates a table named 'defaults' in the SQLite database 'defaults.db' if it does not already exist. The table includes fields for various default values such as SSH password, AWS access key, AWS secret key, new host details, FreeIPA server information, GUID, and Ollama.
+    """
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('''
@@ -37,14 +41,23 @@ def init_db():
         conn.commit()
 
 def get_defaults():
-    """Retrieve the latest defaults from the database."""
+    """
+    Retrieve the latest defaults from the database.
+
+    Returns:
+        tuple: A tuple containing the latest defaults retrieved from the database.
+    """
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('SELECT * FROM defaults ORDER BY id DESC LIMIT 1')
             return cursor.fetchone()
 
 def save_defaults(defaults):
-    """Save the provided defaults to the database."""
+    '''
+    Save the provided defaults to the database.
+
+    :param defaults: A tuple containing default values for various settings.
+    '''
     with closing(sqlite3.connect('defaults.db')) as conn:
         with closing(conn.cursor()) as cursor:
             cursor.execute('''
@@ -56,7 +69,23 @@ def save_defaults(defaults):
         conn.commit()
 
 def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
-    """Trigger a GitHub action with the provided inputs."""
+    """
+    Trigger a GitHub action with the provided inputs.
+
+    Args:
+        repo_owner (str): The owner of the GitHub repository.
+        repo_name (str): The name of the GitHub repository.
+        workflow_id (str): The ID of the workflow to trigger.
+        token (str): The GitHub personal access token for authorization.
+        inputs (dict): The inputs to pass to the GitHub action.
+
+    Raises:
+        HTTPError: If the request to trigger the GitHub action fails.
+
+    Prints:
+        - "GitHub Action triggered successfully." if successful.
+        - Error messages if the GitHub action triggering fails.
+    """
     url = (
         f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
         f"actions/workflows/{workflow_id}/dispatches"
@@ -80,7 +109,16 @@ def trigger_github_action(repo_owner, repo_name, workflow_id, token, inputs):
 
 
 def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token):
-    """Update a GitHub secret with the provided value."""
+    """
+    Update a GitHub secret with the provided value.
+
+    Args:
+        repo_owner (str): The owner of the GitHub repository.
+        repo_name (str): The name of the GitHub repository.
+        secret_name (str): The name of the secret to update.
+        secret_value (str): The new value for the secret.
+        token (str): The GitHub personal access token for authorization.
+    """
     public_key_url = (
         f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
         f"actions/secrets/public-key"
@@ -92,13 +130,13 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     public_key_response = requests.get(public_key_url, headers=headers)
     public_key_response.raise_for_status()
     public_key_data = public_key_response.json()
-    
+
     public_key = nacl.public.PublicKey(
         public_key_data['key'].encode(), encoder=nacl.encoding.Base64Encoder
     )
     sealed_box = nacl.public.SealedBox(public_key)
     encrypted = sealed_box.encrypt(secret_value.encode())
-    
+
     update_secret_url = (
         f"https://api.github.com/repos/{repo_owner}/{repo_name}/"
         f"actions/secrets/{secret_name}"
@@ -111,7 +149,17 @@ def update_github_secret(repo_owner, repo_name, secret_name, secret_value, token
     update_secret_response.raise_for_status()
 
 def generate_runner_token(repo_owner, repo_name, token):
-    """Generate a self-hosted runner token."""
+    """
+    Generate a self-hosted runner token.
+
+    Args:
+        repo_owner (str): The owner of the GitHub repository.
+        repo_name (str): The name of the GitHub repository.
+        token (str): The GitHub personal access token for authentication.
+
+    Returns:
+        str: The self-hosted runner token generated for the repository.
+    """
     url = f"https://api.github.com/repos/{repo_owner}/kcli-pipelines/actions/runners/registration-token"
     headers = {
         "Authorization": f"token {token}",
@@ -122,11 +170,15 @@ def generate_runner_token(repo_owner, repo_name, token):
     return response.json()['token']
 
 def cli_main(args):
-    """Main function for CLI execution."""
+    """
+    Main function for CLI execution.
+
+    Executes the CLI logic by generating a self-hosted runner token, updating GitHub secrets, and triggering a GitHub action with provided inputs.
+    """
     repo_owner = "tosin2013"
     repo_name = "baremetal-playbooks"
     workflow_id = "equinix-metal-baremetal-blank-server.yml"
-    token = os.getenv("GITHUB_TOKEN")
+    token = os.getenv("BARE_METAL_TOKEN")
     kcli_token = os.getenv("KCLI_PIPELINES_GITHUB_TOKEN")
 
     # Generate the self-hosted runner token
@@ -159,7 +211,11 @@ def cli_main(args):
     print("Pipeline has been triggered successfully.")
 
 def gui_main():
-    """Main function for GUI execution using Streamlit."""
+    """
+    Main function for GUI execution using Streamlit.
+
+    This function sets up the GUI interface for triggering Equinix Metal server instance, allowing users to input or retrieve default values for various parameters like SSH password, AWS keys, host details, and FreeIPA server information. It triggers the pipeline on GitHub with the provided inputs and allows users to save the entered variables.
+    """
     st.title("Equinix Metal Server Instance Trigger")
 
     defaults = get_defaults()
@@ -211,7 +267,7 @@ def gui_main():
         update_github_secret(repo_owner, repo_name, "SSH_PASSWORD", ssh_password, token)
         update_github_secret(repo_owner, repo_name, "AWS_ACCESS_KEY", aws_access_key, token)
         update_github_secret(repo_owner, repo_name, "AWS_SECRET_KEY", aws_secret_key, token)
-        update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN", 
+        update_github_secret(repo_owner, repo_name, "KCLI_PIPELINES_RUNNER_TOKEN",
                              kcli_pipelines_runner_token, token)
 
         save_defaults((
@@ -230,6 +286,11 @@ def gui_main():
         ))
         st.success("Variables have been saved successfully.")
 
+"""
+Module to trigger Equinix Metal server instance and update SSH password.
+
+This module contains functions to initialize a SQLite database, retrieve and save defaults, trigger GitHub actions, update GitHub secrets, generate a self-hosted runner token, and handle CLI and GUI executions.
+"""
 def main():
     """Main entry point of the application."""
     init_db()
