@@ -519,14 +519,33 @@ if [ $# -eq 0 ]; then
 fi
 
 # Define the path to the secrets file
+# This script sets up environment variables for various configuration files used in the project.
+# 
+# SECRETS_FILE: Path to the YAML file containing secret variables.
+# PIPELINES_VARS: Absolute path to the YAML file containing pipeline variables.
+# GITHUB_ACTIONS_VARS_FILE: Path to the YAML file containing GitHub Actions variables.
+# FREEIPA_VARS_FILE: Path to the YAML file containing FreeIPA variables.
+# OCP_AI_SVC_VARS_FILE: Path to the YAML file containing OpenShift AI service universal variables.
 SECRETS_FILE="vars/secrets.yml"
 PIPELINES_VARS="$(pwd)/vars/pipeline-variables.yaml"
 GITHUB_ACTIONS_VARS_FILE="vars/github-actions-vars.yml"
 FREEIPA_VARS_FILE="vars/freeipa-vars.yml"
 OCP_AI_SVC_VARS_FILE="vars/ocp4-ai-svc-universal.yml"
 
-
-# Function to update individual YAML variables
+# Function: update_yaml_variable
+# Description: Updates a specified key in a YAML file with a given value.
+# Parameters:
+#   - file: The path to the YAML file to be updated.
+#   - key: The key in the YAML file to be updated.
+#   - value: The new value to set for the specified key.
+# Usage:
+#   update_yaml_variable "/path/to/file.yaml" "key.to.update" "new_value"
+# Notes:
+#   - The function handles escaping of double quotes and backslashes in the value to prevent YAML syntax issues.
+#   - If the value contains multiple lines, it uses a block scalar for multi-line strings.
+#   - The function relies on the yq command-line tool to edit the YAML file.
+#   - The environment variable YQ_COMMAND should be set to the appropriate yq command.
+#   - If the update fails, the function prints an error message and exits with status 1.
 function update_yaml_variable {
   local file="$1"
   local key="$2"
@@ -555,6 +574,12 @@ function update_yaml_variable {
 
 
 # Check for yq installation
+# This script checks for the presence of the 'yq' command-line tool, which is used for parsing YAML files.
+# It first checks if 'yq' is available in the system's PATH using the 'command -v' command.
+# If 'yq' is found, it sets the YQ_COMMAND variable to 'yq' and prints a message indicating that 'yq' is installed.
+# If 'yq' is not found in the PATH, it checks if an executable named 'yq' is present in the current directory.
+# If the local 'yq' executable is found, it sets the YQ_COMMAND variable to './yq' and prints a message indicating that './yq' is installed.
+# If neither check succeeds, it prints an error message and exits the script with a status code of 1.
 if command -v yq &> /dev/null; then
   echo 'yq is installed.' >&2
   YQ_COMMAND="yq"
@@ -566,6 +591,13 @@ else
   exit 1
 fi
 
+# This script bootstraps the environment by loading environment variables
+# from a vault and checking if they are loaded correctly. It also defines
+# the path to the original hosts file.
+
+# load_env_vars --load-from-vault: Loads environment variables from a vault.
+# check_env_vars: Checks if the environment variables are loaded correctly.
+# ORIGINAL_HOSTS_FILE: Path to the original hosts file.
 load_env_vars --load-from-vault
 
 # Check if environment variables are loaded
@@ -584,6 +616,13 @@ sed -i "/^\[github_servers\]/!b;n;c$NEW_HOST ansible_user=$NEW_USERNAME" "$ORIGI
 
 echo "Hosts file updated successfully."
 
+# This script performs the following tasks:
+# 1. Reformats and validates the private SSH key.
+#    - The private key is reformatted and saved to a file named "formatted_private_key.pem".
+#    - The reformatted key file is then validated.
+# 2. Updates the secrets.yml file with SSH keys using the yq command.
+#    - The script echoes the SSH public key to ensure it is available.
+#    - The yq command is used to update the secrets.yml file with the SSH public key and the reformatted private key.
 # Reformat and validate the private key
 SSH_PRIVATE_KEY_FILE="formatted_private_key.pem"
 reformat_key "$SSH_PRIVATE_KEY" "$SSH_PRIVATE_KEY_FILE"
@@ -598,6 +637,18 @@ ${YQ_COMMAND} e -i ".ssh_private_key = \"$(cat $SSH_PRIVATE_KEY_FILE)\"" "$SECRE
 echo "Updated secrets.yml successfully."
 
 # Use yq to update github-actions-vars.yml
+# This script updates the `github-actions-vars.yml` file with new values for various variables.
+# It uses the `yq` command to modify the YAML file in place.
+# The following variables are updated:
+# - github_token: The GitHub token used for authentication.
+# - ssh_password: The SSH password.
+# - json_body.inputs.hostname: The new hostname.
+# - json_body.inputs.domain: The new domain.
+# - json_body.inputs.zone_name: The new domain (same as above).
+# - json_body.inputs.guid: The GUID.
+# - json_body.inputs.forwarder: The new forwarder.
+# - json_body.inputs.ollama: The Ollama value.
+# After updating the variables, the script prints the contents of the updated `github-actions-vars.yml` file.
 echo "Updating github-actions-vars.yml..."
 # Use yq to update github_token, ssh_password, and json_body variables in github-actions-vars.yml
 ${YQ_COMMAND} e -i ".github_token = \"$GITHUB_TOKEN\"" "$GITHUB_ACTIONS_VARS_FILE"
@@ -613,6 +664,13 @@ cat $GITHUB_ACTIONS_VARS_FILE
 echo "Updated github-actions-vars.yml:"
 cat "$GITHUB_ACTIONS_VARS_FILE"
 
+# This script updates the freeipa-vars.yml file with various environment variables
+# using the yq command-line tool. The following variables are updated:
+# - .github_token: Set to the value of the KCLI_PIPELINES_GITHUB_TOKEN environment variable.
+# - .freeipa_server_fqdn: Set to the value of the FREEIPA_SERVER_FQDN environment variable.
+# - .freeipa_server_domain: Set to the value of the FREEIPA_SERVER_DOMAIN environment variable.
+# - .freeipa_server_admin_password: Set to the value of the FREEIPA_SERVER_ADMIN_PASSWORD environment variable.
+# - .json_body.inputs.hostname: Set to the value of the NEW_HOST environment variable.
 # Use yq to update freeipa-vars.yml
 echo "Updating freeipa-vars.yml..."
 ${YQ_COMMAND} e -i ".github_token = \"$KCLI_PIPELINES_GITHUB_TOKEN\"" "$FREEIPA_VARS_FILE"
@@ -625,6 +683,10 @@ ${YQ_COMMAND} e -i ".json_body.inputs.hostname = \"$NEW_HOST\"" "$FREEIPA_VARS_F
 echo "Updated freeipa-vars.yml:"
 cat "$FREEIPA_VARS_FILE"
 
+# This script updates the ocp-ai-svc-vars.yml file using the yq command-line tool.
+# It performs the following updates:
+# 1. Sets the .github_token field to the value of the OCP_AI_SVC_PIPELINES_GITHUB_TOKEN environment variable.
+# 2. Sets the .json_body.inputs.hostname field to the value of the NEW_HOST environment variable.
 # Use yq to update ocp-ai-svc-vars.yml
 echo "Updating ocp-ai-svc-vars.yml..."
 ${YQ_COMMAND} e -i ".github_token = \"$OCP_AI_SVC_PIPELINES_GITHUB_TOKEN\"" "$OCP_AI_SVC_VARS_FILE"
@@ -634,6 +696,26 @@ echo "Updated ocp-ai-svc-vars.yml:"
 cat "$OCP_AI_SVC_VARS_FILE"
 
 # Update pipeline-variables.yaml with AWS credentials
+# This script updates the pipeline-variables.yaml file with AWS and KCLI credentials.
+# 
+# It performs the following steps:
+# 1. Updates the aws_access_key and aws_secret_key variables in the pipeline-variables.yaml file
+#    using the values of the AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.
+# 2. Updates the kcli_pipelines_runner_token variable in the pipeline-variables.yaml file
+#    using the value of the KCLI_PIPELINES_RUNNER_TOKEN environment variable.
+# 3. Prints the updated pipeline-variables.yaml file to the console.
+#
+# Usage:
+# Ensure that the following environment variables are set before running this script:
+# - AWS_ACCESS_KEY: Your AWS access key.
+# - AWS_SECRET_KEY: Your AWS secret key.
+# - KCLI_PIPELINES_RUNNER_TOKEN: Your KCLI pipelines runner token.
+#
+# Example:
+# export AWS_ACCESS_KEY="your_aws_access_key"
+# export AWS_SECRET_KEY="your_aws_secret_key"
+# export KCLI_PIPELINES_RUNNER_TOKEN="your_kcli_pipelines_runner_token"
+# ./bootstrap.sh
 echo "Updating pipeline-variables.yaml with AWS_ACCESS_KEY and AWS_SECRET_KEY..."
 update_yaml_variable "$PIPELINES_VARS" "aws_access_key" "$AWS_ACCESS_KEY"
 update_yaml_variable "$PIPELINES_VARS" "aws_secret_key" "$AWS_SECRET_KEY"
@@ -645,6 +727,41 @@ echo "Updated pipeline-variables.yaml successfully:"
 cat "$PIPELINES_VARS"
 
 
+# This script processes command-line arguments and executes corresponding actions.
+# 
+# Available options:
+# 
+# --push-ssh-key
+#     Runs the Ansible playbook to push SSH keys.
+# 
+# --push-pipeline-vars
+#     Runs the Ansible playbook to push pipeline variables.
+# 
+# --trigger-github-pipelines
+#     Runs the Ansible playbook to trigger GitHub pipelines.
+# 
+# --copy-image
+#     Downloads RHEL8 and RHEL9 images on the target host.
+# 
+# --copy-files
+#     Copies directory files to the target location.
+# 
+# --ipa-server
+#     Runs the Ansible playbook for IPA server setup.
+# 
+# --ocp-ai-svc
+#     Runs the Ansible playbook for OCP AI service setup.
+# 
+# --debug-pipeline-vars
+#     Debugs pipeline variables.
+# 
+# --load-from-vault
+#     Loads environment variables from a vault.
+# 
+# --help
+#     Displays usage information.
+# 
+# If an unknown option is provided, an error message is displayed along with usage information.
 # Argument Parsing and Execution
 for arg in "$@"; do
     case $arg in
