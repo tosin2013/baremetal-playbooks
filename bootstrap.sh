@@ -395,6 +395,28 @@ function reformat_key {
 
 # Function to validate SSH key file
 function validate_key_file {
+  # Validate an SSH private key file
+  #
+  # This function validates an SSH private key file by using the `ssh-keygen` command to check
+  # its format. If the key is invalid, the function logs an error message and exits the script
+  # with a status code of 1. If the key is valid, it logs a success message.
+  #
+  # Usage:
+  #   validate_key_file <key_file>
+  #
+  # Parameters:
+  #   key_file - The file path to the SSH private key to be validated.
+  #
+  # Example:
+  #   validate_key_file "formatted_private_key.pem"
+  #
+  # Output:
+  #   If the key is valid, the function will log:
+  #     SSH private key in <key_file> is valid.
+  #   If the key is invalid, the function will log:
+  #     ERROR: The private key in <key_file> is invalid.
+  #   and exit the script with a status code of 1.
+
   local key_file="$1"
   cat $key_file
   if ! ssh-keygen -lf "$key_file" > /dev/null 2>&1; then
@@ -406,6 +428,21 @@ function validate_key_file {
 
 # Function to debug pipeline variables
 function debug_pipeline_vars {
+  # Debug the pipeline-variables.yaml file
+  #
+  # This function displays the content of the `pipeline-variables.yaml` file for debugging purposes.
+  # It prints the entire content of the file to the standard output and then exits the script with a
+  # status code of 0.
+  #
+  # Usage:
+  #   debug_pipeline_vars
+  #
+  # Example:
+  #   debug_pipeline_vars
+  #
+  # Output:
+  #   The function will print the content of `pipeline-variables.yaml` to the console and exit the
+  #   script with a status code of 0.
   echo "Debugging pipeline-variables.yaml:"
   cat "$PIPELINES_VARS"
   exit 0
@@ -413,6 +450,26 @@ function debug_pipeline_vars {
 
 # Function to copy files to target host
 function copy_dir_files {
+  # Copy files to a target directory on a remote host
+  #
+  # This function copies files from the local directory to a specified target directory on a remote host.
+  # It first creates the target directory on the remote host if it does not already exist. If the directory
+  # creation fails, the function logs an error message and exits the script with a status code of 1.
+  #
+  # Usage:
+  #   copy_dir_files
+  #
+  # Environment Variables:
+  #   NEW_USERNAME - The username for the remote host.
+  #   NEW_HOST - The hostname or IP address of the remote host.
+  #
+  # Example:
+  #   copy_dir_files
+  #
+  # Output:
+  #   If the directory creation is successful, the function will proceed to copy files to the target directory.
+  #   If the directory creation fails, the function will log an error message and exit the script with a status code of 1.
+
   TARGET_HOST="${NEW_USERNAME}@${NEW_HOST}"
   TARGET_DIR="/tmp/baremetal-playbooks"
 
@@ -429,13 +486,6 @@ function copy_dir_files {
   echo "Files copied to $TARGET_HOST:$TARGET_DIR successfully."
 }
 
-# Function to reformat SSH private key (reused if necessary)
-# Already defined earlier
-
-# Function to validate SSH key file (reused if necessary)
-# Already defined earlier
-
-# Function to run Ansible playbooks
 function run_ansible_playbook {
   local playbook="$1"
   local vars_file="$2"
